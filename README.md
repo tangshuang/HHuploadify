@@ -15,3 +15,5 @@ HHuploadify的用法和Huploadify的用法是一模一样的。不过增加了�
 修改样式：通过修改HHuploadify.css文件中的样式来控制表现。
 
 上传后得到的图片预览是通过将图片作为该区域的背景图片实现的，因此，如果要调整该图片，必须通过css来进行控制。
+
+http://www.tangshuang.net/2002.html
