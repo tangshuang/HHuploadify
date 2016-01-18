@@ -2,6 +2,8 @@
 /* CSS Document */
 .uploadify-button {
 	display:inline-block;
+	float: left;
+	position: relative;
 	width: 120px;
 	height: 90px;
 	line-height: 90px;
@@ -43,12 +45,11 @@
 	clear: both;
 }
 .uploadify-queue {
-	display: inline-block;
-	float: left;
 }
 .uploadify-queue .uploadify-queue-item {
-	list-style-type:none;
 	display: inline-block;
+	float: left;
+	position: relative;
 	width: 120px;
 	height: 90px;
 	line-height: 90px;
@@ -59,8 +60,6 @@
 	border-radius: 4px;
 	font-size: .8em;
 	margin-right: 5px;
-	position: relative;
-	float: left;
 	border: #0078CC solid 1px;
 	margin-bottom: 10px;
 }
@@ -72,24 +71,22 @@
 .uploadify-queue .uploadify-queue-item.drag {
 	background-color: #0078aa;
 }
-.uploadify-queue .uploadify-queue-item img {
-}
+.uploadify-queue .uploadify-queue-item img {}
 .uploadbtn,
 .delfilebtn {
 	line-height: 1;
 	text-decoration: none;
 	color: #fff;
 }
-.uploadbtn{
-	display: none; /*默认不显示上传按钮，非自动上传时用js控制显示*/
-	right: 40px;
-}
-.disabledbtn {
-}
 .up_filename,.progressnum,.delfilebtn,.uploadbtn,.up_percent{
 	color:#fff;
 	margin-left:5px;
 }
+.uploadbtn{
+	display: none; /*默认不显示上传按钮，非自动上传时用js控制显示*/
+	right: 40px;
+}
+.disabledbtn {}
 .delfilebtn {
 	position: absolute;
 	top: 5px;
