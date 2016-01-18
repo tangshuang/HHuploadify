@@ -7,12 +7,12 @@
 	line-height: 90px;
 	text-align: center;
 	background-color: #0099FF;
-	color: #fff;
+	color: #fff !important;
 	cursor:pointer;
 	text-decoration:none;
 	border-radius: 4px;
 	font-size: .8em;
-
+	border: #0078CC solid 1px !important;
 	transition: background-color .3s;
 }
 .uploadify-button:hover {
@@ -61,11 +61,15 @@
 	position: relative;
 	float: left;
 	border: #0078CC solid 1px;
+	margin-bottom: 10px;
 }
 .uploadify-queue .uploadify-queue-item.uploaded {
 	background-repeat : no-repeat;
 	background-position : center;
 	background-size : cover;
+}
+.uploadify-queue .uploadify-queue-item.drag {
+	background-color: #0078aa;
 }
 .uploadify-queue .uploadify-queue-item img {
 }
@@ -82,21 +86,20 @@
 .disabledbtn {
 }
 .up_filename,.progressnum,.delfilebtn,.uploadbtn,.up_percent{
-	font-size:12px;
 	color:#fff;
-	margin-left:10px;
+	margin-left:5px;
 }
 .delfilebtn {
 	position: absolute;
 	top: 5px;
 	right: 5px;
 	display: inline-block;
-	border: #0078CC solid 1px;
+	border: #0078CC solid 1px !important;
 	color: #0078CC;
 	width: 16px;
 	height: 16px;
 	text-align: center;
-	line-height: 16px;
+	line-height: 16px !important;
 	border-radius: 50%;
 }
 .delfilebtn:hover {
