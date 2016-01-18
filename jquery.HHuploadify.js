@@ -101,7 +101,7 @@
 					inputStr += option.buttonText;
 					inputStr += '</span></a>';
 					var uploadFileListStr = '<div id="file_upload_'+instanceNumber+'-queue" class="uploadify-queue"></div>';
-					_this.append('<div class="uploadify">' + uploadFileListStr + inputStr + '<div class="uploadify-clear"></div>' + '</div>');
+					_this.append('<div class="uploadify">' + uploadFileListStr + inputStr + '</div>');
 
 					//初始化返回的实例
 					returnObj =  {
