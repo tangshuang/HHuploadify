@@ -14,6 +14,7 @@
 	font-size: .8em;
 	border: #0078CC solid 1px !important;
 	transition: background-color .3s;
+	margin-bottom: 10px;
 }
 .uploadify-button:hover {
 	background-color: #0086E3;
