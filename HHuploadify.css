@@ -1,0 +1,121 @@
+@charset "utf-8";
+/* CSS Document */
+.uploadify-button {
+	display:inline-block;
+	width: 120px;
+	height: 90px;
+	line-height: 90px;
+	text-align: center;
+	background-color: #0099FF;
+	color: #fff;
+	cursor:pointer;
+	text-decoration:none;
+	border-radius: 4px;
+	font-size: .8em;
+
+	transition: background-color .3s;
+}
+.uploadify-button:hover {
+	background-color: #0086E3;
+}
+/*
+.uploadify-button span {
+	display: inline-block;
+	padding: 5px 10px;
+	border: #0078CC solid 1px;
+	color: #fff;
+	line-height: 1;
+	border-radius: 2px;
+
+	transition: color-color .3s;
+}
+.uploadify-button:hover span {
+	border-color: #0374C4;
+}
+*/
+
+
+.uploadfile {
+	width:0;
+}
+.uploadify-clear {
+	clear: both;
+}
+.uploadify-queue {
+	display: inline-block;
+	float: left;
+}
+.uploadify-queue .uploadify-queue-item {
+	list-style-type:none;
+	display: inline-block;
+	width: 120px;
+	height: 90px;
+	line-height: 90px;
+	text-align: center;
+	background-color: #0099FF;
+	cursor:pointer;
+	text-decoration:none;
+	border-radius: 4px;
+	font-size: .8em;
+	margin-right: 5px;
+	position: relative;
+	float: left;
+	border: #0078CC solid 1px;
+}
+.uploadify-queue .uploadify-queue-item.uploaded {
+	background-repeat : no-repeat;
+	background-position : center;
+	background-size : cover;
+}
+.uploadify-queue .uploadify-queue-item img {
+}
+.uploadbtn,
+.delfilebtn {
+	line-height: 1;
+	text-decoration: none;
+	color: #fff;
+}
+.uploadbtn{
+	display: none; /*默认不显示上传按钮，非自动上传时用js控制显示*/
+	right: 40px;
+}
+.disabledbtn {
+}
+.up_filename,.progressnum,.delfilebtn,.uploadbtn,.up_percent{
+	font-size:12px;
+	color:#fff;
+	margin-left:10px;
+}
+.delfilebtn {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	display: inline-block;
+	border: #0078CC solid 1px;
+	color: #0078CC;
+	width: 16px;
+	height: 16px;
+	text-align: center;
+	line-height: 16px;
+	border-radius: 50%;
+}
+.delfilebtn:hover {
+	color: #fff;
+	background: #0078CC;
+}
+.uploadify-progress{
+	 display:inline-block; 
+	 width:90px;
+	 height:10px; 
+	 background-color:white;
+	 border-radius:5px;
+	 border:1px solid #0078CC;
+	 vertical-align:middle;
+	 padding:0;
+}
+.uploadify-progress-bar{
+	width:0;
+	height:100%;
+	border-radius:5px;
+	background-color: #0099FF;
+}

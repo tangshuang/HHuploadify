@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>HHuploadify 演示</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="HHuploadify.css">
+        <script src="jquery-2.2.0.min.js"></script>
+        <script src="jquery.HHuploadify.js"></script>
+    </head>
+    <body>
+        <h4>多选上传</h4>
+        <div id="upload"></div>
+        <script>
+            $('#upload').HHuploadify({
+                auto:true,
+                fileTypeExts:'*.jpg;*.png;*.gift',
+                multi:true,
+                formData:{key:123456,key2:'vvvv'},
+                fileSizeLimit:1024,
+                uploader:'upload.php',
+                onUploadStart:function(file){
+                    console.log(file.name+'开始上传');
+                },
+                onInit:function(obj){
+                    console.log('初始化');
+                    console.log(obj);
+                },
+                onUploadComplete:function(file){
+                    console.log(file.name+'上传完成');
+                },
+                onCancel:function(file){
+                    console.log(file.name+'删除成功');
+                },
+                onClearQueue:function(queueItemCount){
+                    console.log('有'+queueItemCount+'个文件被删除了');
+                },
+                onDestroy:function(){
+                    console.log('destroyed!');
+                },
+                onSelect:function(file){
+                    console.log(file.name+'加入上传队列');
+                },
+                onQueueComplete:function(queueData){
+                    console.log('队列中的文件全部上传完成',queueData);
+                }
+            });
+        </script>
+        <h4>单个上传</h4>
+        <div id="upload2"></div>
+        <script>
+            $('#upload2').HHuploadify({
+                auto:true,
+                fileTypeExts:'*.jpg;*.png;*.gift',
+                isSingle : true,
+                fileSizeLimit:1024,
+                uploader:'upload.php'
+            });
+        </script>
+    </body>
+</html>
