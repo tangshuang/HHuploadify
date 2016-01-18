@@ -101,7 +101,7 @@
 					inputStr += option.buttonText;
 					inputStr += '</span></a>';
 					var uploadFileListStr = '<div id="file_upload_'+instanceNumber+'-queue" class="uploadify-queue"></div>';
-					_this.append(uploadFileListStr + inputStr + '<div class="uploadify-clear"></div>');
+					_this.append('<div class="uploadify">' + uploadFileListStr + inputStr + '<div class="uploadify-clear"></div>' + '</div>');
 
 					//初始化返回的实例
 					returnObj =  {
@@ -367,7 +367,7 @@
 										});
 									},option.removeTimeout);
 									// 上传成功后，把上传结果图片显示在区域内
-									var data = JSON.parse(xhr.responseText);
+									var data = JSON.parse(xhr.responseText); // 解析为json，注意responseText是文本
 									if(data.url != undefined) {
 										_this.find('#fileupload_'+instanceNumber+'_'+file.index).addClass('uploaded').css({'background-image' : 'url(' + data.url + ')'});
 									}
