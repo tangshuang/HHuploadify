@@ -1,3 +1,8 @@
+/**
+ * 本文件中提供了几个函数方法，仅在你需要的时候便捷使用，当然你也可以不用使用，自己加载插件来进行处理
+ * 你也可以把本页里面的内容作为例子来研究，大概了解下一些特殊的用法
+ */
+ 
 function initHHuploadify(selector,uploader,field,isSingle) {
     var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1;
     isSingle = typeof isSingle == 'boolean' ? isSingle : false;
