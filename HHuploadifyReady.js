@@ -1,19 +1,21 @@
-/**
- * 本文件中提供了几个函数方法，仅在你需要的时候便捷使用，当然你也可以不用使用，自己加载插件来进行处理
- * 你也可以把本页里面的内容作为例子来研究，大概了解下一些特殊的用法
- */
- 
-function initHHuploadify(selector,uploader,field,isSingle) {
-    var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1;
+function initHHuploadify(selector,uploader,field,isSingle,title) {
     isSingle = typeof isSingle == 'boolean' ? isSingle : false;
     $(selector).HHuploadify({
         auto: true,
         fileTypeExts: '*.jpg;*.png;*.jpeg;*.gif',
         multi: true,
+        buttonText: title == undefined ? '选择图片' : '选择' + title,
+        itemTitle: title == undefined ? false : title,
         fileSizeLimit: 99999999,
         uploader: uploader,
         isSingle: isSingle,
+        onSelect : function() {
+            var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1;
+            var $instance = $('#file_upload_' + instanceNumber + '-queue');
+            $instance.dragsort("destroy");
+        },
         onUploadSuccess:function(file,result){
+            var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1;
             result = JSON.parse(result);
             if(result.status == 0) {
                 alert(file.name + '没有上传成功。' + result.info);
@@ -22,53 +24,15 @@ function initHHuploadify(selector,uploader,field,isSingle) {
                 var file_index = file.index,
                     image_id = result.id;
                 var $fileInstance = $('#fileupload_' + instanceNumber +  '_' + file_index);
-                $fileInstance.append('<input type="hidden" name="' + field + (isSingle ? '' : '[]') + '" value="' + image_id + '">');
+                $fileInstance.append('<input type="hidden" name="' + field + (!isSingle ? '[]' : '') + '" value="' + image_id + '">');
             }
         },
         onQueueComplete:function(){
             if(isSingle)
                 return false;
-            try {
-                var $instance = $('#file_upload_' + instanceNumber + '-queue');
-                $instance.dragsort("destroy");
-                $instance.dragsort({
-                    dragSelector: "div.uploadify-queue-item",
-                    dragBetween: true,
-                    dragEnd: function () {
-                        $instance.find('.uploadify-queue-item').removeClass('drag');
-                    },
-                    placeHolderTemplate: '<div class="uploadify-queue-item drag"></div>'
-                });
-            }
-            catch (Exception) {
-                console.log(Exception);
-            }
-        }
-    });
-}
 
-function initHHuploadifyOne(selector,uploader,field) {
-    initHHuploadify(selector,uploader,field,true);
-}
-
-function resetHHuploadify(selector,images,field) {
-    var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1,
-        $instance = $('#file_upload_' + instanceNumber + '-queue');
-    var html = '';
-
-    for(i = 0;i < images.length;i ++) {
-        var image = images[i];
-        html += '<div class="uploadify-queue-item uploaded" style="background-image: url(' + image.url + ')">';
-        html += '<input type="hidden" name="' + field + '[]" value="' + image.id + '">';
-        html += '<a href="javascript:void(0);" class="delfilebtn">&times;</a>';
-        html += '</div>';
-    }
-
-    $instance.append(html);
-
-    // 测试是否存在dragsort，如果不存在，则抛出错误，如果存在，则执行，如果你安装了dragsort，建议将try去掉，直接使用内部的代码
-    try {
-       if(images.length > 1) {
+            var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1;
+            var $instance = $('#file_upload_' + instanceNumber + '-queue');
             $instance.dragsort({
                 dragSelector: "div.uploadify-queue-item",
                 dragBetween: true,
@@ -78,18 +42,63 @@ function resetHHuploadify(selector,images,field) {
                 placeHolderTemplate: '<div class="uploadify-queue-item drag"></div>'
             });
         }
-    }
-    catch (Exception) {
-        console.log(Exception);
+    });
+}
+
+function initHHuploadifyOne(selector,uploader,field,title) {
+    initHHuploadify(selector,uploader,field,true,title);
+}
+
+function initHHuploadifyCount(selector,uploader,fields,titles) {
+    var html,num,id,field,title;
+    for(i = 0;i < fields.length;i ++) {
+        num = i + 1;
+        id = decodeURIComponent(selector.replace('#','').replace('.','')) + num;
+        html = '<div id="' + id + '" class="uploadify-container"></div>';
+        field = fields[i];
+        title = titles[i];
+        $(selector).append(html);
+        initHHuploadifyOne('#' + id,uploader,field,title);
     }
 }
 
-function resetHHuploadifyOne(selector,image,field) {
+function resetHHuploadify(selector,images,field,title) {
+    var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1,
+        $instance = $('#file_upload_' + instanceNumber + '-queue');
+    var html = '';
+
+    for(i = 0;i < images.length;i ++) {
+        var image = images[i];
+        html += '<div class="uploadify-queue-item uploaded" style="background-image: url(' + image.url + ')">';
+        if(title != undefined)
+            html += '<span class="itemtitle">' + title + '</span>';
+        html += '<input type="hidden" name="' + field + '[]" value="' + image.id + '">';
+        html += '<a href="javascript:void(0);" class="delfilebtn">&times;</a>';
+        html += '</div>';
+    }
+
+    $instance.append(html);
+
+    if(images.length > 1) {
+        $instance.dragsort({
+            dragSelector: "div.uploadify-queue-item",
+            dragBetween: true,
+            dragEnd: function () {
+                $instance.find('.uploadify-queue-item').removeClass('drag');
+            },
+            placeHolderTemplate: '<div class="uploadify-queue-item drag"></div>'
+        });
+    }
+}
+
+function resetHHuploadifyOne(selector,image,field,title) {
     var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1,
         $instance = $('#file_upload_' + instanceNumber + '-queue');
     var html = '';
 
     html += '<div class="uploadify-queue-item uploaded" style="background-image: url(' + image.url + ')">';
+    if(title != undefined)
+        html += '<span class="itemtitle">' + title + '</span>';
     html += '<input type="hidden" name="' + field + '" value="' + image.id + '">';
     html += '<a href="javascript:void(0);" class="delfilebtn">&times;</a>';
     html += '</div>';
@@ -97,6 +106,16 @@ function resetHHuploadifyOne(selector,image,field) {
     $instance.append(html);
 
     $(selector).find('.uploadify-button').hide();
+}
+
+function resetHHuploadifyCount(selector,images,fields,titles) {
+    $(selector).find('.uploadify-container').each(function(i){
+        var $this = $(this);
+        var image = images[i];
+        var field = fields[i];
+        var title = titles[i];
+        resetHHuploadifyOne('#' + $this.attr('id'),image,field,title);
+    });
 }
 
 // 点击删除按钮时，要移除整个区块

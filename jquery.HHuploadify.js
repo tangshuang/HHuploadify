@@ -15,6 +15,7 @@
 			showUploadedPercent:false,//是否实时显示上传的百分比，如20%
 			showUploadedSize:false,//是否实时显示已上传的文件大小，如1M/2M
 			buttonText:'选择文件',//上传按钮上的文字
+			itemTitle:false,// 该上传item区域的标题：该值将作为上传按钮的提示语，上传时，会显示在左上角，注意，每一个上传区都会有，所以尽可能再isSingle=true的情况下使用
 			removeTimeout: 1000,//上传完成后进度条的消失时间，单位毫秒
 			itemTemplate:itemTemp,//上传队列显示的模板
 			onUploadStart:null,//上传开始时的动作
@@ -226,7 +227,13 @@
 					else {
 						$html.find('.uploadbtn').remove();
 					}
-					uploadManager._getFileList().append($html);
+
+					// 是否显示上传提示itemTitle
+					if(option.itemTitle != false) {
+						var title = '<span class="itemtitle">' + option.itemTitle + '</span>';
+						$html.prepend(title);
+
+					}
 
 					//判断是否显示已上传文件大小
 					if(option.showUploadedSize){
@@ -244,6 +251,9 @@
 						var percentText = '<span class="up_percent">0%</span>';
 						$html.find('.uploadify-progress').after(percentText);
 					}
+
+					// 添加DOM
+					uploadManager._getFileList().append($html);
 
 					//触发select动作
 					option.onSelect && option.onSelect(file);

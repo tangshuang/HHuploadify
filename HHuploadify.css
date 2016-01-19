@@ -1,4 +1,15 @@
 @charset "utf-8";
+.uploadify-container,
+.uploadify,
+.uploadify-queue {
+	display: inline-block;
+	float: left;
+	position: relative;
+}
+.uploadify-clear {
+	clear: both;
+}
+
 /* CSS Document */
 .uploadify-button {
 	display:inline-block;
@@ -17,6 +28,7 @@
 	border: #0078CC solid 1px !important;
 	transition: background-color .3s;
 	margin-bottom: 10px;
+	margin-right: 5px;
 }
 .uploadify-button:hover {
 	background-color: #0086E3;
@@ -37,15 +49,10 @@
 }
 */
 
-
 .uploadfile {
 	width:0;
 }
-.uploadify-clear {
-	clear: both;
-}
-.uploadify-queue {
-}
+.uploadify-queue {}
 .uploadify-queue .uploadify-queue-item {
 	display: inline-block;
 	float: left;
@@ -77,6 +84,18 @@
 	line-height: 1;
 	text-decoration: none;
 	color: #fff;
+}
+.itemtitle {
+	display: inline-block;
+	position: absolute;
+	top: 4px;
+	left: 5px;
+	line-height: 1;
+	padding: 5px 7px;
+	background: #0078CC;
+	color: #fff;
+	border-radius: 10px;
+
 }
 .up_filename,.progressnum,.delfilebtn,.uploadbtn,.up_percent{
 	color:#fff;
