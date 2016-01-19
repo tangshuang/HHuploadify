@@ -22,7 +22,7 @@ function initHHuploadify(selector,uploader,field,isSingle) {
                 var file_index = file.index,
                     image_id = result.id;
                 var $fileInstance = $('#fileupload_' + instanceNumber +  '_' + file_index);
-                $fileInstance.append('<input type="hidden" name="' + field + (isSingle ? '[]' : '') + '" value="' + image_id + '">');
+                $fileInstance.append('<input type="hidden" name="' + field + (isSingle ? '' : '[]') + '" value="' + image_id + '">');
             }
         },
         onQueueComplete:function(){
