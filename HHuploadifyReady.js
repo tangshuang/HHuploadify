@@ -53,7 +53,7 @@ function initHHuploadifyCount(selector,uploader,fields,titles) {
     var html,num,id,field,title;
     for(i = 0;i < fields.length;i ++) {
         num = i + 1;
-        id = decodeURIComponent(selector.replace('#','').replace('.','')) + num;
+        id = decodeURIComponent(selector.replace('#','').replace('.','').replace(' ','-')) + num;
         html = '<div id="' + id + '" class="uploadify-container"></div>';
         field = fields[i];
         title = titles[i];
