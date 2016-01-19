@@ -34,12 +34,12 @@ function initHHuploadify(selector,uploader,field,isSingle,title) {
             var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1;
             var $instance = $('#file_upload_' + instanceNumber + '-queue');
             $instance.dragsort({
-                dragSelector: "div.uploadify-queue-item",
+                dragSelector: "span.uploadify-queue-item",
                 dragBetween: true,
                 dragEnd: function () {
                     $instance.find('.uploadify-queue-item').removeClass('drag');
                 },
-                placeHolderTemplate: '<div class="uploadify-queue-item drag"></div>'
+                placeHolderTemplate: '<span class="uploadify-queue-item drag"></span>'
             });
         }
     });
@@ -54,7 +54,7 @@ function initHHuploadifyCount(selector,uploader,fields,titles) {
     for(i = 0;i < fields.length;i ++) {
         num = i + 1;
         id = decodeURIComponent(selector.replace('#','').replace('.','').replace(' ','-')) + num;
-        html = '<div id="' + id + '" class="uploadify-container"></div>';
+        html = '<span id="' + id + '" class="uploadify-container"></span>';
         field = fields[i];
         title = titles[i];
         $(selector).append(html);
@@ -69,24 +69,24 @@ function resetHHuploadify(selector,images,field,title) {
 
     for(i = 0;i < images.length;i ++) {
         var image = images[i];
-        html += '<div class="uploadify-queue-item uploaded" style="background-image: url(' + image.url + ')">';
+        html += '<span class="uploadify-queue-item uploaded" style="background-image: url(' + image.url + ')">';
         if(title != undefined)
             html += '<span class="itemtitle">' + title + '</span>';
         html += '<input type="hidden" name="' + field + '[]" value="' + image.id + '">';
         html += '<a href="javascript:void(0);" class="delfilebtn">&times;</a>';
-        html += '</div>';
+        html += '</span>';
     }
 
     $instance.append(html);
 
     if(images.length > 1) {
         $instance.dragsort({
-            dragSelector: "div.uploadify-queue-item",
+            dragSelector: "span.uploadify-queue-item",
             dragBetween: true,
             dragEnd: function () {
                 $instance.find('.uploadify-queue-item').removeClass('drag');
             },
-            placeHolderTemplate: '<div class="uploadify-queue-item drag"></div>'
+            placeHolderTemplate: '<span class="uploadify-queue-item drag"></span>'
         });
     }
 }
@@ -96,12 +96,12 @@ function resetHHuploadifyOne(selector,image,field,title) {
         $instance = $('#file_upload_' + instanceNumber + '-queue');
     var html = '';
 
-    html += '<div class="uploadify-queue-item uploaded" style="background-image: url(' + image.url + ')">';
+    html += '<span class="uploadify-queue-item uploaded" style="background-image: url(' + image.url + ')">';
     if(title != undefined)
         html += '<span class="itemtitle">' + title + '</span>';
     html += '<input type="hidden" name="' + field + '" value="' + image.id + '">';
     html += '<a href="javascript:void(0);" class="delfilebtn">&times;</a>';
-    html += '</div>';
+    html += '</span>';
 
     $instance.append(html);
 

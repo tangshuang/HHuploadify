@@ -1,6 +1,6 @@
 (function($){
 	$.fn.HHuploadify = function(opts){
-		var itemTemp = '<div id="${fileID}" class="uploadify-queue-item"><div class="uploadify-progress"><div class="uploadify-progress-bar"></div></div><span class="up_filename">${fileName}</span><a href="javascript:void(0);" class="uploadbtn">上传</a><a href="javascript:void(0);" class="delfilebtn">&times;</a></div>';
+		var itemTemp = '<span id="${fileID}" class="uploadify-queue-item"><span class="uploadify-progress"><span class="uploadify-progress-bar"></span></span><span class="up_filename">${fileName}</span><a href="javascript:void(0);" class="uploadbtn">上传</a><a href="javascript:void(0);" class="delfilebtn">&times;</a></span>';
 		var defaults = {
 			fileTypeExts:'*.*',//允许上传的文件类型，格式'*.jpg;*.doc'
 			uploader:'',//文件提交的地址
@@ -101,8 +101,8 @@
 					inputStr += '<a id="file_upload_'+instanceNumber+'-button" href="javascript:void(0)" class="uploadify-button"><span>';
 					inputStr += option.buttonText;
 					inputStr += '</span></a>';
-					var uploadFileListStr = '<div id="file_upload_'+instanceNumber+'-queue" class="uploadify-queue"></div>';
-					_this.append('<div class="uploadify">' + uploadFileListStr + inputStr + '<div class="uploadify-clear"></div>' + '</div>');
+					var uploadFileListStr = '<span id="file_upload_'+instanceNumber+'-queue" class="uploadify-queue"></span>';
+					_this.append('<span class="uploadify">' + uploadFileListStr + inputStr + '<span class="uploadify-clear"></span>' + '</span>');
 
 					//初始化返回的实例
 					returnObj =  {
