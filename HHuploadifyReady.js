@@ -92,6 +92,10 @@ function resetHHuploadify(selector,images,field,title) {
 }
 
 function resetHHuploadifyOne(selector,image,field,title) {
+    // 如果该图片信息为空，那么就不做任何处理
+    if(image.id == undefined || !image.id || image.id == '' || image.id == '0')
+        return;
+        
     var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1,
         $instance = $('#file_upload_' + instanceNumber + '-queue');
     var html = '';
