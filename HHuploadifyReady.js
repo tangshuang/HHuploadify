@@ -63,6 +63,10 @@ function initHHuploadifyCount(selector,uploader,fields,titles) {
 }
 
 function resetHHuploadify(selector,images,field,title) {
+    // 如果不存在图片，则不作任何处理
+    if(images.length <= 0)
+        return;
+    
     var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1,
         $instance = $('#file_upload_' + instanceNumber + '-queue');
     var html = '';
