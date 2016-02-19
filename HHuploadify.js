@@ -1,4 +1,5 @@
 /**
+ * version 1.0.2
  * HHuploadify - a jquery plugin for pictures uploading extending Huploadify ( which extends uploadify )
  * written on omd 1.1 https://github.com/tangshuang/omd
  */
