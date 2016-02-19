@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HHuploadify Demo</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../HHuploadify.css">
+    <script src="../src/jquery-2.2.0.min.js"></script>
+    <script src="../HHuploadify.js"></script>
+    <script src="../src/jquery.dragsort-0.5.2.min.js"></script>
+    <script src="../HHuploadifyReady.js"></script>
+</head>
+<body>
+
+<h4>multiple</h4>
+<div id="upload"></div>
+<script>
+    $.HHuploadify.init('#upload','upload.php','image');
+</script>
+
+<br style="clear: both">
+
+<h4>single</h4>
+<div id="upload2"></div>
+<script>
+    $.HHuploadify.initOne('#upload2','upload.php','image');
+</script>
+
+<br style="clear: both">
+
+<h4>several</h4>
+<div id="upload3"></div>
+<script>
+    $.HHuploadify.initCount('#upload3','upload.php',['image1','image2','image3'],['thumbnail1','','thumbnail3']);
+</script>
+
+</body>
+</html>

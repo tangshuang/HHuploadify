@@ -1,38 +1,127 @@
-function initHHuploadify(selector,uploader,field,isSingle,title) {
-    isSingle = typeof isSingle == 'boolean' ? isSingle : false;
-    $(selector).HHuploadify({
-        auto: true,
-        fileTypeExts: '*.jpg;*.png;*.jpeg;*.gif',
-        multi: true,
-        buttonText: title == undefined ? '选择图片' : '选择' + title,
-        itemTitle: title == undefined ? false : title,
-        fileSizeLimit: 99999999,
-        uploader: uploader,
-        isSingle: isSingle,
-        onSelect : function() {
-            var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1;
-            var $instance = $('#file_upload_' + instanceNumber + '-queue');
-            $instance.dragsort("destroy");
-        },
-        onUploadSuccess:function(file,result){
-            var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1;
-            result = JSON.parse(result);
-            if(result.status == 0) {
-                alert(file.name + '没有上传成功。' + result.info);
-            }
-            else {
-                var file_index = file.index,
-                    image_id = result.id;
-                var $fileInstance = $('#fileupload_' + instanceNumber +  '_' + file_index);
-                $fileInstance.append('<input type="hidden" name="' + field + (!isSingle ? '[]' : '') + '" value="' + image_id + '">');
-            }
-        },
-        onQueueComplete:function(){
-            if(isSingle)
-                return false;
+/**
+ * HHuploadify ready functions and actions, you may not need this if you can write your own script to operate the uploadify area
+ * written on omd 1.1 https://github.com/tangshuang/omd
+ */
 
-            var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1;
-            var $instance = $('#file_upload_' + instanceNumber + '-queue');
+!function(dependencies,window,factory){
+    // amd || cmd
+    if(typeof define == 'function') {
+        // amd requirejs
+        if(define.amd != undefined) {
+            define(dependencies,function() {
+                return factory(window,require);
+            });
+        }
+        // cmd seajs
+        else if(define.cmd != undefined) {
+            define(dependencies,function(require) {
+                return factory(window,require);
+            });
+        }
+    }
+    else {
+        var ex = factory(window);
+        // CommonJS NodeJS
+        if(typeof module !== 'undefined' && typeof exports === 'object') {
+            module.exports = ex;
+        }
+        // Javascript: exports as window functions
+        else {
+            for(var i in ex) {
+                window[i] = ex[i];
+            }
+        }
+    }
+}(['jquery'],window,function(window,require){
+    if(typeof window.$ === 'undefined')
+        throw new Error("jQuery required");
+    var $ = window.$;
+
+    function initHHuploadify(selector,uploader,field,isSingle,title) {
+        isSingle = typeof isSingle == 'boolean' ? isSingle : false;
+        $(selector).HHuploadify({
+            auto: true,
+            fileTypeExts: '*.jpg;*.png;*.jpeg;*.gif',
+            multi: true,
+            buttonText: title == undefined ? 'choose' : 'choose ' + title,
+            itemTitle: title == undefined || title == '' ? false : title,
+            fileSizeLimit: 99999999,
+            uploader: uploader,
+            isSingle: isSingle,
+            onSelect : function() {
+                var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1;
+                var $instance = $('#file_upload_' + instanceNumber + '-queue');
+                $instance.dragsort("destroy");
+            },
+            onUploadSuccess:function(file,result){
+                var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1;
+                result = JSON.parse(result);
+                if(result.status == 0) {
+                    alert(file.name + 'upload failed.' + result.info);
+                }
+                else {
+                    var file_index = file.index,
+                        image_id = result.id;
+                    var $fileInstance = $('#fileupload_' + instanceNumber +  '_' + file_index);
+                    $fileInstance.append('<input type="hidden" name="' + field + (!isSingle ? '[]' : '') + '" value="' + image_id + '">');
+                }
+            },
+            onQueueComplete:function(){
+                if(isSingle)
+                    return false;
+
+                var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1;
+                var $instance = $('#file_upload_' + instanceNumber + '-queue');
+                $instance.dragsort({
+                    dragSelector: "span.uploadify-queue-item",
+                    dragBetween: true,
+                    dragEnd: function () {
+                        $instance.find('.uploadify-queue-item').removeClass('drag');
+                    },
+                    placeHolderTemplate: '<span class="uploadify-queue-item drag"></span>'
+                });
+            }
+        });
+    }
+
+    function initHHuploadifyOne(selector,uploader,field,title) {
+        initHHuploadify(selector,uploader,field,true,title);
+    }
+
+    function initHHuploadifyCount(selector,uploader,fields,titles) {
+        var html,num,id,field,title;
+        for(i = 0;i < fields.length;i ++) {
+            num = i + 1;
+            id = decodeURIComponent(selector.replace('#','').replace('.','').replace(' ','-')) + num;
+            html = '<span id="' + id + '" class="uploadify-container"></span>';
+            field = fields[i];
+            title = titles[i];
+            $(selector).append(html);
+            initHHuploadifyOne('#' + id,uploader,field,title);
+        }
+    }
+
+    function resetHHuploadify(selector,images,field,title) {
+        if(images.length <= 0)
+            return;
+
+        var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1,
+            $instance = $('#file_upload_' + instanceNumber + '-queue');
+        var html = '';
+
+        for(i = 0;i < images.length;i ++) {
+            var image = images[i];
+            html += '<span class="uploadify-queue-item uploaded" style="background-image: url(' + image.url + ')">';
+            if(title != undefined)
+                html += '<span class="itemtitle">' + title + '</span>';
+            html += '<input type="hidden" name="' + field + '[]" value="' + image.id + '">';
+            html += '<a href="javascript:void(0);" class="delfilebtn">&times;</a>';
+            html += '</span>';
+        }
+
+        $instance.append(html);
+
+        if(images.length > 1) {
             $instance.dragsort({
                 dragSelector: "span.uploadify-queue-item",
                 dragBetween: true,
@@ -42,98 +131,58 @@ function initHHuploadify(selector,uploader,field,isSingle,title) {
                 placeHolderTemplate: '<span class="uploadify-queue-item drag"></span>'
             });
         }
-    });
-}
-
-function initHHuploadifyOne(selector,uploader,field,title) {
-    initHHuploadify(selector,uploader,field,true,title);
-}
-
-function initHHuploadifyCount(selector,uploader,fields,titles) {
-    var html,num,id,field,title;
-    for(i = 0;i < fields.length;i ++) {
-        num = i + 1;
-        id = decodeURIComponent(selector.replace('#','').replace('.','').replace(' ','-')) + num;
-        html = '<span id="' + id + '" class="uploadify-container"></span>';
-        field = fields[i];
-        title = titles[i];
-        $(selector).append(html);
-        initHHuploadifyOne('#' + id,uploader,field,title);
     }
-}
 
-function resetHHuploadify(selector,images,field,title) {
-    // 如果不存在图片，则不作任何处理
-    if(images.length <= 0)
-        return;
-    
-    var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1,
-        $instance = $('#file_upload_' + instanceNumber + '-queue');
-    var html = '';
+    function resetHHuploadifyOne(selector,image,field,title) {
+        if(image.id == undefined || !image.id || image.id == '' || image.id == '0')
+            return;
 
-    for(i = 0;i < images.length;i ++) {
-        var image = images[i];
+        var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1,
+            $instance = $('#file_upload_' + instanceNumber + '-queue');
+        var html = '';
+
         html += '<span class="uploadify-queue-item uploaded" style="background-image: url(' + image.url + ')">';
         if(title != undefined)
             html += '<span class="itemtitle">' + title + '</span>';
-        html += '<input type="hidden" name="' + field + '[]" value="' + image.id + '">';
+        html += '<input type="hidden" name="' + field + '" value="' + image.id + '">';
         html += '<a href="javascript:void(0);" class="delfilebtn">&times;</a>';
         html += '</span>';
+
+        $instance.append(html);
+
+        $(selector).find('.uploadify-button').hide();
     }
 
-    $instance.append(html);
-
-    if(images.length > 1) {
-        $instance.dragsort({
-            dragSelector: "span.uploadify-queue-item",
-            dragBetween: true,
-            dragEnd: function () {
-                $instance.find('.uploadify-queue-item').removeClass('drag');
-            },
-            placeHolderTemplate: '<span class="uploadify-queue-item drag"></span>'
+    function resetHHuploadifyCount(selector,images,fields,titles) {
+        $(selector).find('.uploadify-container').each(function(i){
+            var $this = $(this);
+            var image = images[i];
+            var field = fields[i];
+            var title = titles[i];
+            resetHHuploadifyOne('#' + $this.attr('id'),image,field,title);
         });
     }
-}
 
-function resetHHuploadifyOne(selector,image,field,title) {
-    // 如果该图片信息为空，那么就不做任何处理
-    if(image.id == undefined || !image.id || image.id == '' || image.id == '0')
-        return;
-        
-    var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1,
-        $instance = $('#file_upload_' + instanceNumber + '-queue');
-    var html = '';
-
-    html += '<span class="uploadify-queue-item uploaded" style="background-image: url(' + image.url + ')">';
-    if(title != undefined)
-        html += '<span class="itemtitle">' + title + '</span>';
-    html += '<input type="hidden" name="' + field + '" value="' + image.id + '">';
-    html += '<a href="javascript:void(0);" class="delfilebtn">&times;</a>';
-    html += '</span>';
-
-    $instance.append(html);
-
-    $(selector).find('.uploadify-button').hide();
-}
-
-function resetHHuploadifyCount(selector,images,fields,titles) {
-    $(selector).find('.uploadify-container').each(function(i){
-        var $this = $(this);
-        var image = images[i];
-        var field = fields[i];
-        var title = titles[i];
-        resetHHuploadifyOne('#' + $this.attr('id'),image,field,title);
+    window.$.extend({
+        HHuploadify : {
+            init : initHHuploadify,
+            initOne : initHHuploadifyOne,
+            initCount : initHHuploadifyCount,
+            reset : resetHHuploadify,
+            resetOne : resetHHuploadifyOne,
+            resetCount : resetHHuploadifyCount
+        }
     });
-}
 
-// 点击删除按钮时，要移除整个区块
-$(document).on('click','.uploadify-queue-item .delfilebtn',function(e){
-    e.preventDefault();
-    var $this = $(this),
-        $box = $this.parent();
-    $box.fadeOut(function(){
-        if($box.parent().find('.uploadify-queue-item').length <= 1)
-            $box.parent().parent().find('.uploadify-button').show();
-        $box.remove();
+    // delete reset item
+    $(document).on('click','.uploadify-queue-item .delfilebtn',function(e){
+        e.preventDefault();
+        var $this = $(this),
+            $box = $this.parent();
+        $box.fadeOut(function(){
+            if($box.parent().find('.uploadify-queue-item').length <= 1)
+                $box.parent().parent().find('.uploadify-button').show();
+            $box.remove();
+        });
     });
 });
