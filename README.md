@@ -32,7 +32,9 @@ When you want to use ready helpers :
 
 ## Usage
 
+screenshot
 
+![screenshot](https://github.com/tangshuang/HHuploadify/blob/master/src/screenshot.png?raw=true)
 
 1. setup
 
