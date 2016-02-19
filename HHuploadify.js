@@ -1,27 +1,18 @@
 /**
  * version 1.0.2
  * HHuploadify - a jquery plugin for pictures uploading extending Huploadify ( which extends uploadify )
- * written on omd 1.1 https://github.com/tangshuang/omd
+ * written on omd 1.1.2 https://github.com/tangshuang/omd
  */
 
-!function(dependencies,window,factory){
+!function(dependencies,factory){
 	// amd || cmd
-	if(typeof define == 'function') {
-		// amd requirejs
-		if(define.amd != undefined) {
-			define(dependencies,function() {
-				return factory(window,require);
-			});
-		}
-		// cmd seajs
-		else if(define.cmd != undefined) {
-			define(dependencies,function(require) {
-				return factory(window,require);
-			});
-		}
+	if(typeof define == 'function' && (define.cmd || define.amd)) {
+		define(dependencies,function() {
+			return factory();
+		});
 	}
 	else {
-		var ex = factory(window);
+		var ex = factory();
 		// CommonJS NodeJS
 		if(typeof module !== 'undefined' && typeof exports === 'object') {
 			module.exports = ex;
@@ -33,11 +24,8 @@
 			}
 		}
 	}
-}(['jquery'],window,function(window,require){
-	if(typeof window.$ === 'undefined')
-		throw new Error("jQuery required");
-
-	window.$.fn.HHuploadify = function(opts){
+}(['jquery'],function(){
+	$.fn.HHuploadify = function(opts){
 		var itemTemp = '<span id="${fileID}" class="uploadify-queue-item"><span class="uploadify-queue-item-container"><span class="uploadify-progress"><span class="uploadify-progress-bar"></span></span><span class="up_filename">${fileName}</span><a href="javascript:void(0);" class="uploadbtn">上传</a><a href="javascript:void(0);" class="delfilebtn">&times;</a></span></span>';
 		var defaults = {
 			fileTypeExts:'*.jpg;*.jpeg;*.png;*.gif',//file can be uploaded exts like: '*.jpg;*.doc'
@@ -475,7 +463,5 @@
 		});
 
 		return returnObj;
-
 	}
-
 });

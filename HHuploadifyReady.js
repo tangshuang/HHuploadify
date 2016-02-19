@@ -3,24 +3,15 @@
  * written on omd 1.1 https://github.com/tangshuang/omd
  */
 
-!function(dependencies,window,factory){
+!function(dependencies,factory){
     // amd || cmd
-    if(typeof define == 'function') {
-        // amd requirejs
-        if(define.amd != undefined) {
-            define(dependencies,function() {
-                return factory(window,require);
-            });
-        }
-        // cmd seajs
-        else if(define.cmd != undefined) {
-            define(dependencies,function(require) {
-                return factory(window,require);
-            });
-        }
+    if(typeof define == 'function' && (define.cmd || define.amd)) {
+        define(dependencies,function() {
+            return factory();
+        });
     }
     else {
-        var ex = factory(window);
+        var ex = factory();
         // CommonJS NodeJS
         if(typeof module !== 'undefined' && typeof exports === 'object') {
             module.exports = ex;
@@ -32,11 +23,7 @@
             }
         }
     }
-}(['jquery'],window,function(window,require){
-    if(typeof window.$ === 'undefined')
-        throw new Error("jQuery required");
-    var $ = window.$;
-
+}(['jquery'],function(){
     function initHHuploadify(selector,uploader,field,isSingle,title) {
         isSingle = typeof isSingle == 'boolean' ? isSingle : false;
         $(selector).HHuploadify({
@@ -163,7 +150,7 @@
         });
     }
 
-    window.$.extend({
+    $.extend({
         HHuploadify : {
             init : initHHuploadify,
             initOne : initHHuploadifyOne,
