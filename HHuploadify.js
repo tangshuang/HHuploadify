@@ -197,7 +197,8 @@
 
 							uploadManager._getFiles(e);
 							// 如果是单个文件上传，那么要隐藏上传按钮
-							if(option.isSingle) {
+							var fileCount = _this.find('.uploadify-queue .uploadify-queue-item').length; // 注意这个一行，如果选择的文件有问题，弹出提示信息，如果没有这一行的话，上传按钮就会消失
+							if(option.isSingle && fileCount > 0) {
 								_this.find('.uploadify-button').hide();
 							}
 						});

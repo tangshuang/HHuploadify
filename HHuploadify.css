@@ -32,6 +32,7 @@
 }
 .uploadify-button:hover {
 	background-color: #0086E3;
+	text-decoration: none;
 }
 /*
 .uploadify-button span {

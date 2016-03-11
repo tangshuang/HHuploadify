@@ -16,25 +16,20 @@
         if(typeof module !== 'undefined' && typeof exports === 'object') {
             module.exports = ex;
         }
-        // Javascript: exports as window functions
-        else {
-            for(var i in ex) {
-                window[i] = ex[i];
-            }
-        }
     }
-}(['jquery'],function(){
-    function initHHuploadify(selector,uploader,field,isSingle,title) {
+}(['jquery','dragsort'],function(){
+    function initHHuploadify(selector,uploader,field,title,isSingle) {
         isSingle = typeof isSingle == 'boolean' ? isSingle : false;
         $(selector).HHuploadify({
             auto: true,
             fileTypeExts: '*.jpg;*.png;*.jpeg;*.gif',
             multi: true,
-            buttonText: title == undefined ? 'choose' : 'choose ' + title,
-            itemTitle: title == undefined || title == '' ? false : title,
+            buttonText: title ? '选择' + title : '选择图片',
+            itemTitle: title || false,
             fileSizeLimit: 99999999,
             uploader: uploader,
             isSingle: isSingle,
+            showPreview: 2,
             onSelect : function() {
                 var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1;
                 var $instance = $('#file_upload_' + instanceNumber + '-queue');
@@ -42,15 +37,21 @@
             },
             onUploadSuccess:function(file,result){
                 var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1;
-                result = JSON.parse(result);
-                if(result.status == 0) {
-                    alert(file.name + 'upload failed.' + result.info);
+                if(result != '') {
+                    result = JSON.parse(result);
+                    if(result.status == 0) {
+                        alert(file.name + '上传失败。' + result.info);
+                    }
+                    else {
+                        var file_index = file.index,
+                            image_id = result.id;
+                        var $fileInstance = $('#fileupload_' + instanceNumber +  '_' + file_index);
+                        $fileInstance.append('<input type="hidden" name="' + field + (!isSingle ? '[]' : '') + '" value="' + image_id + '">');
+                    }
                 }
                 else {
-                    var file_index = file.index,
-                        image_id = result.id;
-                    var $fileInstance = $('#fileupload_' + instanceNumber +  '_' + file_index);
-                    $fileInstance.append('<input type="hidden" name="' + field + (!isSingle ? '[]' : '') + '" value="' + image_id + '">');
+                    $('#fileupload_'+instanceNumber+'_'+file.index).css('background','#0099FF');
+                    alert(file.name + '上传失败。网络错误。');
                 }
             },
             onQueueComplete:function(){
@@ -72,7 +73,7 @@
     }
 
     function initHHuploadifyOne(selector,uploader,field,title) {
-        initHHuploadify(selector,uploader,field,true,title);
+        initHHuploadify(selector,uploader,field,title,true);
     }
 
     function initHHuploadifyCount(selector,uploader,fields,titles) {
@@ -99,7 +100,7 @@
         for(i = 0;i < images.length;i ++) {
             var image = images[i];
             html += '<span class="uploadify-queue-item uploaded" style="background-image: url(' + image.url + ')">';
-            if(title != undefined)
+            if(title)
                 html += '<span class="itemtitle">' + title + '</span>';
             html += '<input type="hidden" name="' + field + '[]" value="' + image.id + '">';
             html += '<a href="javascript:void(0);" class="delfilebtn">&times;</a>';
@@ -129,7 +130,7 @@
         var html = '';
 
         html += '<span class="uploadify-queue-item uploaded" style="background-image: url(' + image.url + ')">';
-        if(title != undefined)
+        if(title)
             html += '<span class="itemtitle">' + title + '</span>';
         html += '<input type="hidden" name="' + field + '" value="' + image.id + '">';
         html += '<a href="javascript:void(0);" class="delfilebtn">&times;</a>';
