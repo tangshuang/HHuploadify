@@ -1,5 +1,19 @@
 <?php
 
+// --------------------------- for demo ---------------------------
+
+/*
+sleep(10);
+$arr = array(
+    'id' => 5,
+    'url' => '../src/screenshot.png'
+);
+echo json_encode($arr);
+exit;
+*/
+
+// ---------------------------- your uploader ----------------------------
+
 $filename = $_FILES['file']['name'];
 $filetmp = $_FILES["file"]["tmp_name"];
 

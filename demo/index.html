@@ -45,18 +45,56 @@
                 }
             });
         </script>
+
         <br style="clear: both">
+        
         <h4>单个上传</h4>
         <div id="upload2"></div>
         <script>
             $('#upload2').HHuploadify({
                 auto:true,
-                fileTypeExts:'*.jpg;*.png;*.gift',
-                isSingle : true,
+                fileTypeExts:'*.jpg;*.png;*.gif',
+                single : true,
                 showPreview: true,
                 fileSizeLimit:1024,
                 uploader:'upload.php'
             });
         </script>
+
+
+        <br style="clear: both">
+
+        <h4>百分数进度</h4>
+        <div id="upload3"></div>
+        <script>
+            $('#upload3').HHuploadify({
+                auto:true,
+                showUploadedBar: false, // 默认情况下，会显示进度条，如果想只显示百分比，则应该关掉
+                showUploadedPercent: true,
+                fileTypeExts:'*.jpg;*.png;*.gif',
+                showPreview: true,
+                fileSizeLimit:1024,
+                uploader:'upload.php'
+            });
+        </script>
+
+        <br style="clear: both">
+
+        <h4>上传显示文件名和已经上传的大小</h4>
+        <div id="upload4"></div>
+        <script>
+            $('#upload4').HHuploadify({
+                auto:true,
+                showUploadedBar: false,
+                showUploadedFilename: true,
+                showUploadedSize: true,
+                fileTypeExts:'*.jpg;*.png;*.gif',
+                showPreview: true,
+                fileSizeLimit:1024,
+                uploader:'upload.php'
+            });
+        </script>
+
+
     </body>
 </html>

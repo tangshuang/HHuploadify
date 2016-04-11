@@ -22,13 +22,13 @@
         isSingle = typeof isSingle == 'boolean' ? isSingle : false;
         $(selector).HHuploadify({
             auto: true,
-            fileTypeExts: '*.jpg;*.png;*.jpeg;*.gif',
+            fileTypeExts: '*.jpg;*.png;*.jpeg;*.gif;*.JPG;*.PNG;*.GIF;*.JPEG',
             multi: true,
             buttonText: title ? '选择' + title : '选择图片',
             itemTitle: title || false,
             fileSizeLimit: 99999999,
             uploader: uploader,
-            isSingle: isSingle,
+            single: isSingle,
             showPreview: 2,
             onSelect : function() {
                 var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1;
@@ -122,7 +122,7 @@
     }
 
     function resetHHuploadifyOne(selector,image,field,title) {
-        if(image.id == undefined || !image.id || image.id == '' || image.id == '0')
+        if(!image || image.id == undefined || !image.id || image.id == '' || image.id == '0')
             return;
 
         var instanceNumber = $(selector).find('.uploadify').index('.uploadify') + 1,

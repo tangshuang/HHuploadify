@@ -26,25 +26,33 @@
 	}
 }(['jquery'],function(){
 	$.fn.HHuploadify = function(opts){
-		var itemTemp = '<span id="${fileID}" class="uploadify-queue-item"><span class="uploadify-queue-item-container"><span class="uploadify-progress"><span class="uploadify-progress-bar"></span></span><span class="up_filename">${fileName}</span><a href="javascript:void(0);" class="uploadbtn">上传</a><a href="javascript:void(0);" class="delfilebtn">&times;</a></span></span>';
+
 		var defaults = {
-			fileTypeExts:'*.jpg;*.jpeg;*.png;*.gif',//file can be uploaded exts like: '*.jpg;*.doc'
-			uploader:'',//upload to server url
-			method:'post',//http request type: get/post
-			formData:null,//append data like: {key1:value1,key2:value2}
-			fileObjName:'file',//upload form file name field, php $_FILES['file']
-			multi:true,//choose multi pictures
-			isSingle:false,// force to upload only one item
+            uploader:'',//upload to server url
+            method:'post',//http request type: get/post
+            formData:null,//append data like: {key1:value1,key2:value2}
+            fileObjName:'file',//upload form file name field, php $_FILES['file']
+
+            fileTypeExts:'*.jpg;*.jpeg;*.png;*.gif;*.JPG;*.PNG;*.GIF;*.JPEG',//file can be uploaded exts like: '*.jpg;*.doc'
+            fileSizeLimit:2048,//max upload file size: KB
+
+			multi:true,//choose multi pictures 选择图片的时候可以一次性选择多张图片上传，为false时只能选一张
+			single:false,// force to upload only one item 强制只上传一张图片,这时multi会被强制设置为false
 			auto:true,//auto upload
-			fileSizeLimit:2048,//max upload file size: KB
-			showPreview:1,//preview picture, 0: close; 1: only preview local origin picture; 2: preview picture on server by result 'url' fields after complate uploading
-			showUploadedFilename:false,
-			showUploadedPercent:false,
-			showUploadedSize:false,
-			buttonText:'choose',//words on upload button
-			itemTitle:false,//words in item area, you should use when isSingle=true
+
+            buttonText:'choose',//words on upload button
+            itemTitle:false,//words in item area, you should use when single=true 是否先单个上传框中显示标题,如果为false则表示不显示,否则将显示设置当值
+
+            itemTemplate:'<span id="${fileID}" class="uploadify-queue-item"><span class="uploadify-queue-item-container"><span class="uploadify-progress"></span><a href="javascript:void(0);" class="uploadbtn">上传</a><a href="javascript:void(0);" class="delfilebtn">&times;</a></span></span>',
+
+            showPreview:1,//preview picture, 0: close; 1: only preview local origin picture; 2: preview picture on server by result 'url' fields after complate uploading 是否选择好图片后进行预览,0不预览,1只预览本地图片,2先预览本地图片,上传完成后预览服务器上的图片,需要设置showPreviewField
+			showPreviewField:'url', // 当showPreview=2时,图片上传完成以后,服务器返回当图片地址保存在返回当json的哪一个字段中,这也就是说,图片上传返回数据必须是json
+			showUploadedBar:true, // 是否显示正在上传进度条
+			showUploadedFilename:false, // 是否显示正在上传文件名
+			showUploadedPercent:false, // 是否显示已上传百分比
+			showUploadedSize:false, // 是否显示已上传大小
 			removeTimeout: 500,//process bar fadeout time
-			itemTemplate:itemTemp,
+
 			onInit:null,//when plugin is ready
 			onSelect:null,//when select a file
 			onUploadStart:null,//when a picture upload start
@@ -59,8 +67,8 @@
 
 		var option = $.extend(defaults,opts);
 
-		// force to choose only one picture
-		if(option.isSingle) {
+		// force to choose only one picture 只能上传一张图片时,强制只能选择一张图片
+		if(option.single) {
 			option.multi = false;
 		}
 
@@ -198,7 +206,7 @@
 							uploadManager._getFiles(e);
 							// 如果是单个文件上传，那么要隐藏上传按钮
 							var fileCount = _this.find('.uploadify-queue .uploadify-queue-item').length; // 注意这个一行，如果选择的文件有问题，弹出提示信息，如果没有这一行的话，上传按钮就会消失
-							if(option.isSingle && fileCount > 0) {
+							if(option.single && fileCount > 0) {
 								_this.find('.uploadify-button').hide();
 							}
 						});
@@ -241,7 +249,7 @@
 				},
 				//根据选择的文件，渲染DOM节点
 				_renderFile : function(file){
-					var $html = $(option.itemTemplate.replace(/\${fileID}/g,'fileupload_'+instanceNumber+'_'+file.index).replace(/\${fileName}/g,file.name).replace(/\${fileSize}/g,F.formatFileSize(file.size)).replace(/\${instanceID}/g,_this.attr('id')));
+					var $html = $(option.itemTemplate.replace(/\${fileID}/g,'fileupload_'+instanceNumber+'_'+file.index).replace(/\${instanceID}/g,_this.attr('id')));
 
 					// 预览本地图片
 					if(option.showPreview > 0) {
@@ -271,24 +279,30 @@
 					if(option.itemTitle != false) {
 						var title = '<span class="itemtitle">' + option.itemTitle + '</span>';
 						$html.prepend(title);
+					}
 
+					//判断是否显示上传进度条
+					if(option.showUploadedBar) {
+						var $bar = '<span class="uploadify-progress-bar"><span class="uploadify-progress-bar-inner"></span></span>';
+						$html.find('.uploadify-progress').append($bar);
 					}
 
 					//判断是否显示已上传文件大小
 					if(option.showUploadedSize){
-						var num = '<span class="progressnum"><span class="uploadedsize">0KB</span>/<span class="totalsize">${fileSize}</span></span>'.replace(/\${fileSize}/g,F.formatFileSize(file.size));
-						$html.find('.uploadify-progress').after(num);
+						var $num = '<span class="progressnum"><span class="uploadedsize">0KB</span>/<span class="totalsize">${fileSize}</span></span>'.replace(/\${fileSize}/g,F.formatFileSize(file.size));
+						$html.find('.uploadify-progress').append($num);
 					}
 
 					// 是否在上传时隐藏文件名
-					if(!option.showUploadedFilename) {
-						$html.find('.up_filename').remove();
+					if(option.showUploadedFilename) {
+						var $filename = '<span class="up_filename">${fileName}</span>'.replace(/\${fileName}/g,file.name);
+						$html.prepend($filename);
 					}
 
 					//判断是否显示上传百分比
 					if(option.showUploadedPercent){
-						var percentText = '<span class="up_percent">0%</span>';
-						$html.find('.uploadify-progress').after(percentText);
+						var $percentText = '<span class="up_percent">0%</span>';
+						$html.find('.uploadify-progress').append($percentText);
 					}
 
 					// 添加DOM
@@ -339,7 +353,7 @@
 						if (f.index == file.index) {
 							uploadManager.filteredFiles.splice(i,1);
 							_this.find('#fileupload_'+instanceNumber+'_'+file.index).fadeOut(function(){
-								if(option.isSingle) {
+								if(option.single) {
 									_this.find('.uploadify-button').show();
 								}
 								$(this).remove();
@@ -352,7 +366,7 @@
 				//校正上传完成后的进度条误差
 				_regulateView : function(file){
 					var thisfile = _this.find('#fileupload_'+instanceNumber+'_'+file.index);
-					thisfile.find('.uploadify-progress-bar').css('width','100%');
+					thisfile.find('.uploadify-progress-bar-inner').css('width','100%');
 					option.showUploadedSize && thisfile.find('.uploadedsize').text(thisfile.find('.totalsize').text());
 					option.showUploadedPercent && thisfile.find('.up_percent').text('100%');
 				},
@@ -366,7 +380,9 @@
 					if(option.showUploadedPercent){
 						eleProgress.nextAll('.up_percent').text(percent);
 					}
-					eleProgress.children('.uploadify-progress-bar').css('width',percent);
+					if(option.showUploadedBar) {
+						eleProgress.children('.uploadify-progress-bar-inner').css('width',percent);
+					}
 				},
 				_allFilesUploaded : function(){
 					var queueData = {
@@ -417,9 +433,9 @@
 									// 上传成功后，把上传结果图片显示在区域内
 									_this.find('#fileupload_'+instanceNumber+'_'+file.index).removeClass('uploading').addClass('uploaded');
 									if(option.showPreview > 1) {
-										var data = JSON.parse(xhr.responseText); // 解析为json，注意responseText是文本
-										if(data.url != undefined) {
-											_this.find('#fileupload_'+instanceNumber+'_'+file.index).css({'background-image' : 'url(' + data.url + ')'});
+										var data = $.parseJSON(xhr.responseText); // 解析为json，注意responseText是文本
+										if(data && data[option.showPreviewField] != undefined) {
+											_this.find('#fileupload_'+instanceNumber+'_'+file.index).css({'background-image' : 'url(' + data[option.showPreviewField] + ')'});
 										}
 									}
 								}
@@ -449,7 +465,7 @@
 							var fd = new FormData();
 							fd.append(option.fileObjName,file);
 							if(option.formData){
-								for(key in option.formData){
+								for(var key in option.formData){
 									fd.append(key,option.formData[key]);
 								}
 							}

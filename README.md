@@ -60,7 +60,7 @@ print only one upload item, can only select one picture
 <script>
 $('#upload').HHuploadify({
     uploader: 'upload.php',
-    isSingle: true
+    single: true
 });
 </script>
 ```
@@ -76,7 +76,7 @@ show notice words on the side of every item, like the screenshot show
 <script>
 $('#upload').HHuploadify({
     uploader: 'upload.php',
-    isSingle: true,
+    single: true,
     itemTitle: 'Thumbnail'
 });
 </script>
@@ -102,7 +102,7 @@ for(i = 0;i < itemTitles.length;i ++) {
 
     $('#' + id).HHuploadify({
         uploader: 'upload.php',
-        isSingle: true,
+        single: true,
         itemTitle: title
     });
 }
