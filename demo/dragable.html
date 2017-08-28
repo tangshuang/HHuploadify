@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<link rel="stylesheet" href="../dist/HHuploadify.css">
+<style>
+.clear {
+  clear: both;
+}
+</style>
+
+<script src="../vendors/jquery-2.2.0.min.js"></script>
+<script src="../vendors/jquery.dragsort-0.5.2.min.js"></script>
+<script src="../dist/HHuploadify.dragable.js"></script>
+
+<p>Extend original class by using jquery.dragsort plugin.</p>
+
+<h4>Group 1:</h4>
+<div id="upload1"></div>
+<script>
+new HHuploadify({
+	container: '#upload1',
+	url: '/upload',
+  auto: true,
+})
+</script>
+
+<div class="clear"></div>
+
+<h4>Group 2:</h4>
+<div id="upload2"></div>
+<script>
+new HHuploadify({
+	container: '#upload2',
+	url: '/upload',
+  auto: true,
+})
+</script>

@@ -1,100 +1,88 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>HHuploadify 演示</title>
-        <meta charset="utf-8">
-        <link rel="stylesheet" href="../HHuploadify.css">
-        <script src="../src/jquery-2.2.0.min.js"></script>
-        <script src="../HHuploadify.js"></script>
-    </head>
-    <body>
-        <h4>多选上传</h4>
-        <div id="upload"></div>
-        <script>
-            $('#upload').HHuploadify({
-                auto:true,
-                fileTypeExts:'*.jpg;*.png;*.gif',
-                multi:true,
-                formData:{key:123456,key2:'vvvv'},
-                fileSizeLimit:1024,
-                uploader:'upload.php',
-                onUploadStart:function(file){
-                    console.log(file.name+'开始上传');
-                },
-                onInit:function(obj){
-                    console.log('初始化');
-                    console.log(obj);
-                },
-                onUploadComplete:function(file){
-                    console.log(file.name+'上传完成');
-                },
-                onCancel:function(file){
-                    console.log(file.name+'删除成功');
-                },
-                onClearQueue:function(queueItemCount){
-                    console.log('有'+queueItemCount+'个文件被删除了');
-                },
-                onDestroy:function(){
-                    console.log('destroyed!');
-                },
-                onSelect:function(file){
-                    console.log(file.name+'加入上传队列');
-                },
-                onQueueComplete:function(queueData){
-                    console.log('队列中的文件全部上传完成',queueData);
-                }
-            });
-        </script>
 
-        <br style="clear: both">
-        
-        <h4>单个上传</h4>
-        <div id="upload2"></div>
-        <script>
-            $('#upload2').HHuploadify({
-                auto:true,
-                fileTypeExts:'*.jpg;*.png;*.gif',
-                single : true,
-                showPreview: true,
-                fileSizeLimit:1024,
-                uploader:'upload.php'
-            });
-        </script>
+<link rel="stylesheet" href="../dist/HHuploadify.css">
+<style>
+.clear {
+  clear: both;
+}
+</style>
 
+<script src="../dist/HHuploadify.js"></script>
 
-        <br style="clear: both">
+<h4>With upload button:</h4>
+<div id="upload1"></div>
+<script>
+new HHuploadify({
+	container: '#upload1',
+	url: '/upload',
+})
+</script>
 
-        <h4>百分数进度</h4>
-        <div id="upload3"></div>
-        <script>
-            $('#upload3').HHuploadify({
-                auto:true,
-                showUploadedBar: false, // 默认情况下，会显示进度条，如果想只显示百分比，则应该关掉
-                showUploadedPercent: true,
-                fileTypeExts:'*.jpg;*.png;*.gif',
-                showPreview: true,
-                fileSizeLimit:1024,
-                uploader:'upload.php'
-            });
-        </script>
+<h4 class="clear">Auto upload:</h4>
+<div id="upload2"></div>
+<script>
+new HHuploadify({
+	container: '#upload2',
+	url: '/upload',
+  auto: true,
+})
+</script>
 
-        <br style="clear: both">
+<h4 class="clear">Single upload:</h4>
+<div id="upload3"></div>
+<script>
+new HHuploadify({
+	container: '#upload3',
+	url: '/upload',
+  auto: true,
+  single: true,
+  chooseText: 'Photo',
+})
+</script>
 
-        <h4>上传显示文件名和已经上传的大小</h4>
-        <div id="upload4"></div>
-        <script>
-            $('#upload4').HHuploadify({
-                auto:true,
-                showUploadedBar: false,
-                showUploadedFilename: true,
-                showUploadedSize: true,
-                fileTypeExts:'*.jpg;*.png;*.gif',
-                showPreview: true,
-                fileSizeLimit:1024,
-                uploader:'upload.php'
-            });
-        </script>
+<h4 class="clear">process percent:</h4>
+<div id="upload4"></div>
+<script>
+new HHuploadify({
+	container: '#upload4',
+	url: '/upload',
+  auto: true,
+  showUploadProcess: 'percent',
+})
+</script>
 
+<h4 class="clear">process bar:</h4>
+<div id="upload5"></div>
+<script>
+new HHuploadify({
+	container: '#upload5',
+	url: '/upload',
+  auto: true,
+  showUploadProcess: 'bar',
+})
+</script>
 
-    </body>
-</html>
+<h4 class="clear">Reset Images:</h4>
+<div id="upload6"></div>
+<script>
+let that = new HHuploadify({
+	container: '#upload6',
+	url: '/upload',
+  auto: true,
+  files: [
+    {
+      path: 'http://wx3.sinaimg.cn/mw690/68a0d5e5gy1fcsbq3vrwgj20qo0zkgo5.jpg'
+    },
+    {
+      path: 'http://wx2.sinaimg.cn/mw690/68a0d5e5gy1fcsbqgeyjwj21i01i07wh.jpg',
+    },
+    {
+      path: 'http://wx2.sinaimg.cn/mw690/68a0d5e5gy1fcsbq8g01sj22c03404qs.jpg',
+    },
+  ],
+})
+</script>
+
+<div class="clear"></div>
+<a href="dragable.html">Dragable Items</a>
+<a href="multiple.html">Multiple Items</a>

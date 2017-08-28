@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<link rel="stylesheet" href="../dist/HHuploadify.css">
+<style>
+.clear {
+  clear: both;
+}
+.uploadify-item-title {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  padding: 2px 4px;
+  background-color: #0078CC;
+  color: #fff;
+  border-radius: 5px;
+}
+</style>
+
+<script src="../dist/HHuploadify.js"></script>
+<script>
+window.HHuploadify = window.HHuploadify.default
+</script>
+
+<p>It is easy for you to extend more feature by using HHuploadify.</p>
+
+<span id="item1"></span>
+<span id="item2"></span>
+<script>
+let template = `
+  <span id="uploadify-{queueId}-{fileId}" class="uploadify-item">
+    <span class="uploadify-item-container">
+      <span class="uploadify-item-progress"></span>
+      <span class="uploadify-item-title">{title}</span>
+      <a href="javascript:void(0);" class="uploadify-item-delete" data-fileid="{fileId}">&times;</a>
+    </span>
+  </span>
+`
+let render = title => {
+  return template.replace('{title}', title)
+}
+new HHuploadify({
+	container: '#item1',
+	url: '/upload',
+  auto: true,
+  single: true,
+  chooseText: 'Item1',
+  template: render('Item1 Title'),
+})
+new HHuploadify({
+	container: '#item2',
+	url: '/upload',
+  auto: true,
+  single: true,
+  chooseText: 'Item2',
+  template: render('Item2 Title'),
+})
+</script>

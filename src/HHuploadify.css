@@ -1,0 +1,109 @@
+.uploadify {
+	clear: both;
+	font-size: 12px;
+}
+.uploadify-item,
+.uploadify-choose-button,
+.uploadify-upload-button {
+	display: block;
+	position: relative;
+	float: left;
+	width: 120px;
+	height: 90px;
+	text-align: center;
+	background-color: #0099FF;
+	border: #0078CC solid 1px;
+	border-radius: 5px;
+	margin-right: 5px;
+	margin-bottom: 10px;
+}
+
+.uploadify-choose-button,
+.uploadify-upload-button {
+	line-height: 90px;
+	cursor: pointer;
+	text-decoration:none;
+	color: #fff;
+
+	transition: background-color .3s;
+}
+.uploadify-choose-button:hover,
+.uploadify-upload-button:hover {
+	background-color: #0086E3;
+	text-decoration: none;
+}
+
+.uploadify-queue .uploadify-item {
+	background-repeat : no-repeat;
+	background-position : center;
+	background-size : 120px 90px;
+	position: relative;
+}
+.uploadify-queue .uploadify-item .uploadify-item-container {
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+
+	background-color: rgba(0,0,0,.6);
+	transition: background-color .3s;
+}
+.uploadify-queue .uploadify-item.success .uploadify-item-container {
+	background-color: transparent;
+}
+.uploadify-queue .uploadify-item.error .uploadify-item-container {
+	background-color: rgba(242, 176, 176, .6);
+}
+.uploadify-queue .uploadify-item.dragable .uploadify-item-container {
+	cursor: move;
+}
+.uploadify-queue .uploadify-item .uploadify-item-delete {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	display: block;
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
+	line-height: 16px;
+	text-align: center;
+	border: #0078CC solid 1px;
+	color: #0078CC;
+	text-decoration: none;
+
+	transition: background-color .3s, color .3s;
+}
+.uploadify-queue .uploadify-item .uploadify-item-delete:hover {
+	background-color: #0078CC;
+	color: #fff;
+}
+
+.uploadify-progress-bar {
+	position: absolute;
+	top: 50%;
+	left: 10%;
+	width: 80%;
+	height: 10px;
+	margin-top: -5px;
+	border-radius:5px;
+	border:1px solid #0078CC;
+	background-color: rgba(255, 255, 255, .6)
+}
+.uploadify-progress-bar-inner {
+	float: left;
+	height: 10px;
+	border-radius: 5px;
+	background-color: #0099FF;
+}
+.uploadify-progress-percent,
+.uploadify-progress-size {
+	width: 100%;
+	position: absolute;
+	top: 50%;
+	left: 0;
+	margin-top: -.5em;
+	text-align: center;
+	color: #fff;
+}

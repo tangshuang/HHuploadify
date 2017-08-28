@@ -1,0 +1,22 @@
+{
+  "name": "uploadify",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "webpack"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "babel-register": "^6.26.0",
+    "express": "^4.15.4",
+    "fs-extra": "^4.0.1",
+    "open": "0.0.5",
+    "webpack": "^3.5.5",
+    "webpack-bufferify": "0.0.5"
+  }
+}
