@@ -1,5 +1,3 @@
-import {foreach, invoke, merge, getImageFakeSize, getFileName} from './functions'
-
 export default class {
 	constructor(options = {}) {
 		if (!options.container || options.container.indexOf('#') !== 0) {
@@ -57,7 +55,7 @@ export default class {
 			onDestroy: null, // when all resource removed
 			onReset: null, // when after reset done
 		}
-		this.options = merge(defaults, options)
+		this.options = this.merge(defaults, options)
 
 		// force to choose only one file
 		if(this.options.single) {
@@ -69,6 +67,14 @@ export default class {
 
 		this.init()
 		this.events()
+
+		let appVersion = window.navigator.appVersion
+		this.isSupported = !(appVersion.indexOf('MSIE') > -1 && appVersion.indexOf('MSIE 10') === -1)
+		if (!this.isSupported) {
+			options.multiple = false
+			options.showPreview = 1
+			console.error('Browser not supported!', appVersion)
+		}
 
 		return this
 	}
@@ -85,6 +91,8 @@ export default class {
 				${options.multiple ? 'multiple' : ''}
 				accept="${options.fileTypeExts}"
 				>
+		`
+		let chooseHTML = `
 			<a id="uploadify-choose-button-${id}"
 				href="javascript:void(0)"
 				class="uploadify-choose-button"
@@ -95,11 +103,13 @@ export default class {
 		let uploadHTML = `
 			<a id="uploadify-upload-button-${id}"
 				href="javascript:void(0)"
-				class="uploadify-upload-button"
-				style="display:none"
+				class="uploadify-upload-button hidden"
 				>
 				<span>${options.uploadText}</span>
 			</a>
+		`
+		let errorHTML = `
+			<span id="uploadify-error-${id}" class="uploadify-error hidden"><span class="uploadify-error-container"><span class="uploadify-error-msg"></span></span></span>
 		`
 		let queueHTML = `
 			<span id="uploadify-queue-${id}" class="uploadify-queue"></span>
@@ -107,8 +117,10 @@ export default class {
 		let sectionHTML = `
 			<span class="uploadify">
 				${queueHTML}
-				${inputHTML}
+				${chooseHTML}
 				${uploadHTML}
+				${errorHTML}
+				${inputHTML}
 			</span>
 		`
 
@@ -120,11 +132,22 @@ export default class {
 		this.chooseButton = container.getElementsByClassName('uploadify-choose-button')[0]
 		this.uploadButton = container.getElementsByClassName('uploadify-upload-button')[0]
 
-		if (options.auto) {
-			this.uploadButton.style.display = 'none'
+		this.resetInput = () => {
+			let el = document.createElement('div')
+			el.innerHTML = inputHTML
+			let input = el.children[0]
+			let wrapper = container.children[0]
+			this.input = input
+			input.parentNode.removeChild(input)
+			wrapper.appendChild(input)
+			input.onchange = this.onSelectFiles.bind(this)
 		}
 
-		invoke(options.onInit)
+		if (options.auto) {
+			this.hide(this.uploadButton)
+		}
+
+		this.invoke(options.onInit)
 
 		if (options.files instanceof Array && options.files.length > 0) {
 			this.reset(options.files)
@@ -138,20 +161,25 @@ export default class {
 		}
 	}
 	onSelectFiles() {
+		let options = this.options
+		if (!options.multiple && this.files.filter(item => item.status < 2).length > 0) {
+			this.showError('Waiting upload!')
+			return
+		}
+
 		let files = this.getSelectedFiles()
 		let count = this.getExistsFilesCount()
-		let options = this.options
 
-		foreach(files, file => {
+		this.foreach(files, file => {
 			file.index = ++count
 			file.status = 0 // not begin to upload
 		})
 
-		invoke(options.onSelect, files)
+		this.invoke(options.onSelect, files, this.files)
 
 		let existsCount = this.files.length
 
-		foreach(files, file => {
+		this.foreach(files, file => {
 			this.appendFile(file)
 			if (options.auto) {
 				this.uploadFile(file)
@@ -161,45 +189,64 @@ export default class {
 		let finalCount = this.files.length
 
 		if(options.single) {
-			this.chooseButton.style.display = 'none'
+			this.hide(this.chooseButton)
 		}
 
 		if (!options.auto && finalCount > existsCount) {
-			this.uploadButton.style.display = 'block'
+			this.fadeIn(this.uploadButton)
 		}
-
-		this.input.value = ''
+	}
+	getImageFakeSize(file) {
+		let el = document.createElement('img')
+		el.style.postion = 'fixed'
+		el.style.top = -1000000 + 'px'
+		el.src = file
+		document.body.appendChild(el)
+		let w = el.clientWidth
+		let h = el.clientHeight
+		document.body.removeChild(el)
+		return w * h
+	}
+	getFileName(file) {
+		let eos = file.indexOf(':\\') > -1 ? '\\' : '/'
+		return file.split(eos).pop()
 	}
 	getSelectedFiles() {
-		let files = this.input.files
-		// < IE 10, only one can be selected
-		if (files === undefined) {
-			files = this.input.value.split(',').map(item => {
+		let files = this.isSupported ?
+			this.input.files :
+			this.input.value.split(',').map(item => {
 				let src = item.trim()
 				let file = {
 					path: src,
-					name: getFileName(src),
-					size: getImageFakeSize(src),
+					name: this.getFileName(src),
+					size: this.getImageFakeSize(src),
 				}
 				return file
 			})
-		}
 
 		let options = this.options
 		let arr = []
 		let typeArray = options.fileTypeExts.split(',')
 
-		foreach(files, file => {
+		this.foreach(files, file => {
 			if (typeArray.indexOf(file.name.split('.').pop()) === -1) {
-				invoke(options.onSelectError, 1, file)
+				this.showError('Type Error!')
+				this.invoke(options.onSelectError, 1, file)
 				console.error(`${file.name}'s file type is not allowed!`)
 			}
 			else if (parseInt(this.formatFileSize(file.size, true)) > options.fileSizeLimit) {
-				invoke(options.onSelectError, 2, file)
+				this.showError('Size Limit!')
+				this.invoke(options.onSelectError, 2, file)
 				console.error(`${file.name}'s file size is over limited!`)
 			}
 			else if (this.isFileExists(file)) {
-				invoke(options.onSelectError, 3, file)
+				this.showError('File(s) Exists!')
+
+				let existsFile = this.isFileExists(file)
+				let element = existsFile.element
+				this.blink(element)
+
+				this.invoke(options.onSelectError, 3, file)
 				console.error(`${file.name} is in selected list.`)
 			}
 			else {
@@ -211,9 +258,9 @@ export default class {
 	}
 	isFileExists(file) {
 		let flag = false
-		foreach(this.files, f => {
+		this.foreach(this.files, (f, i) => {
 			if (f.name === file.name && f.size === file.size) {
-				flag = true
+				flag = f
 			}
 		})
 		return flag
@@ -242,16 +289,11 @@ export default class {
 	appendFile(file) {
 		let src
 		if (this.options.showPreview) {
-			// chrome
-			if(window.navigator.userAgent.toLowerCase().indexOf("chrome") >= 1) {
-				src = window.URL.createObjectURL(file);
-			}
-			// firefox
-			else if(window.navigator.userAgent.toLowerCase().indexOf("firefox") >= 1) {
-				src = window.URL.createObjectURL(file);
+			if (typeof window.URL !== 'undefined') {
+				src = window.URL.createObjectURL(file)
 			}
 			else {
-				src = file.path
+				src = 'file:///' + file.path.replace(/\\/g, '/')
 			}
 		}
 		let template = this.options.template
@@ -275,6 +317,78 @@ export default class {
 		this.files.push(file)
 	}
 	uploadFile(file) {
+		this.isSupported ? this.uploadFileByXHR(file) : this.uploadFileByIFrame(file)
+		this.resetInput()
+	}
+	uploadFileByIFrame(file) {
+		if (file.status !== 0) {
+			return
+		}
+		let id = this.id
+		let options = this.options
+		let f = document.createElement('div')
+		f.style.position = 'absolute'
+		f.style.top = '-1000px'
+    f.style.left = '-1000px'
+		f.style.height = '1px'
+		f.style.overflow = 'auto'
+		f.innerHTML = `
+			<form action="${options.url}" method="${options.method}" target="upload-iframe-${id}-${file.index}" enctype="multipart/form-data">
+				<button type="submit"></button>
+			</form>
+			<iframe name="upload-iframe-${id}-${file.index}"></iframe>
+		`
+		f.getElementsByTagName('form')[0].appendChild(this.input)
+
+		let iframe = f.getElementsByTagName('iframe')[0]
+		let iframeOnload = (isTimeout) => {
+			if (file.status !== 1) {
+				return
+			}
+			if (isTimeout === 'timeout') {
+				file.status = 4
+				this.invoke(options.onUploadError, file, 'timeout')
+				file.element.className += ' error'
+			}
+			else {
+				let responseDoc = iframe.contentDocument || iframe.contentWindow.document
+				let responseText = responseDoc.body.children[0].innerText
+
+				file.status = 2
+				this.invoke(options.onUploadSuccess, file, responseText)
+
+				file.element.getElementsByClassName('uploadify-item-container')[0].removeChild(file.element.getElementsByClassName('uploadify-item-progress')[0])
+				file.element.className += ' success'
+
+				if (options.showPreview > 1) {
+					let data = JSON.parse(responseText)
+					if (data && data[options.showPreviewField]) {
+						file.element.style.backgroundImage = `url(${data[options.showPreviewField]})`
+					}
+				}
+			}
+
+			this.invoke(options.onUploadComplete)
+
+			if (this.files.filter(file => file.status < 2).length === 0) {
+				this.invoke(options.onQueueComplete)
+			}
+		}
+		if (window.addEventListener) {
+      iframe.addEventListener('load', iframeOnload, false)
+    }
+    else {
+      iframe.attachEvent('onload', iframeOnload)
+    }
+
+		document.body.appendChild(f)
+		f.getElementsByTagName('button')[0].click()
+
+		file.status = 1
+		file.iframe = iframe.parentNode
+		this.invoke(options.onUploadStart, file)
+	}
+	uploadFileByXHR(file) {
 		if (file.status !== 0) {
 			return
 		}
@@ -282,16 +396,21 @@ export default class {
 		let options = this.options
 		let xhr = new XMLHttpRequest()
 
-		xhr.upload.onprogress = e => {
-			this.onProgress(file, e.loaded, e.total)
+		if (xhr.upload) {
+			xhr.upload.onprogress = e => {
+				this.onProgress(file, e.loaded, e.total)
+			}
 		}
 
 		xhr.onreadystatechange = e => {
+			if (file.status !== 1) {
+				return
+			}
 			if (xhr.readyState == 4) {
 				if (xhr.status == 200) {
 					file.status = 2
 
-					invoke(options.onUploadSuccess, file, xhr.responseText)
+					this.invoke(options.onUploadSuccess, file, xhr.responseText)
 
 					file.element.getElementsByClassName('uploadify-item-container')[0].removeChild(file.element.getElementsByClassName('uploadify-item-progress')[0])
 					file.element.className += ' success'
@@ -305,22 +424,29 @@ export default class {
 				}
 				else {
 					file.status = 3
-					invoke(options.onUploadError, file, xhr.responseText)
+					this.invoke(options.onUploadError, file, xhr.responseText)
 					file.element.className += ' error'
 				}
 
-				invoke(options.onUploadComplete)
+				this.invoke(options.onUploadComplete)
 
 				if (this.files.filter(file => file.status < 2).length === 0) {
-					invoke(options.onQueueComplete)
+					this.invoke(options.onQueueComplete)
 				}
 			}
 		}
 
 		xhr.open(options.method, options.url, true)
 		xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest")
-		let fd = new FormData()
-		fd.append(options.field, file)
+		let fd
+		if (typeof FormData === 'undefined') {
+			fd = []
+			fd.push(options.field, file)
+		}
+		else {
+			fd = new FormData()
+			fd.append(options.field, file)
+		}
 		let data = options.data
 		if (data) {
 			for (let key in data) {
@@ -331,7 +457,7 @@ export default class {
 
 		file.status = 1
 		file.xhr = xhr
-		invoke(options.onUploadStart, file)
+		this.invoke(options.onUploadStart, file)
 	}
 	onProgress(file, loaded, total) {
 		let percent = (loaded / total * 100).toFixed(2) +'%'
@@ -362,27 +488,33 @@ export default class {
 		}
 	}
 	onClickUpload() {
-		foreach(this.files, file => this.uploadFile(file))
-		this.uploadButton.style.display = 'none'
+		this.foreach(this.files, file => this.uploadFile(file))
+		this.fadeOut(this.uploadButton)
+		this.resetInput()
 	}
 	onClickDelete(element, target) {
 		let fileid = target.getAttribute('data-fileid')
 		let file = this.getFileByIndex(fileid)
 		if (file.xhr) {
 			file.xhr.abort()
-			invoke(this.onUploadCancel, file)
+			this.invoke(this.options.onUploadCancel, file)
+		}
+		if (file.iframe) {
+			document.body.removeChild(file.iframe)
+			this.invoke(this.options.onUploadCancel, file)
 		}
 
 		this.queue.removeChild(element)
 		this.files.splice(this.files.indexOf(file), 1)
-		invoke(this.onRemoved, file)
+		this.resetInput()
+		this.invoke(this.options.onRemoved, file)
 
 		if (this.files.length === 0) {
-			this.uploadButton.style.display = 'none'
+			this.fadeOut(this.uploadButton)
 		}
 
 		if (this.options.single) {
-			this.chooseButton.style.display = 'block'
+			this.show(this.chooseButton)
 		}
 	}
 	reset(files) {
@@ -391,7 +523,7 @@ export default class {
 
 		this.queue.innerHTML = ''
 
-		foreach(files, (file, index) => {
+		this.foreach(files, (file, index) => {
 			let tpl = template.replace(/\{queueId}/g, this.id).replace(/\{fileId}/g, index + 1)
 			let el = document.createElement('div')
 			el.innerHTML = tpl
@@ -409,11 +541,88 @@ export default class {
 
 			file.index = index + 1
 			file.status = 2
-			file.name = file.name || getFileName(file.path)
-			file.size = file.size || getImageFakeSize(file.path)
+			file.name = file.name || this.getFileName(file.path)
+			file.size = file.size || this.getImageFakeSize(file.path)
 			this.files.push(file)
 		})
 
-		invoke(this.onReset)
+		this.invoke(this.options.onReset)
+	}
+	showError(msg) {
+		let errorEl = this.container.getElementsByClassName('uploadify-error')[0]
+		errorEl.getElementsByClassName('uploadify-error-msg')[0].innerText = msg
+		this.fadeIn(errorEl)
+		setTimeout(() => this.fadeOut(errorEl), 1500)
+	}
+	// =============== functions ================
+	invoke(factory, ...args) {
+		if (typeof factory === 'function') {
+			factory.apply(this, args)
+		}
+	}
+	hide(element) {
+		let className = element.className
+		if (className.indexOf('hidden') === -1) {
+			element.className += ' hidden'
+		}
+	}
+	show(element) {
+		element.className = element.className.replace('hidden', '')
+	}
+	fadeOut(element) {
+		let className = element.className
+		if (className.indexOf('hidden') > -1) {
+			return
+		}
+		element.className += ' fade fadeIn'
+		element.className = element.className.replace('fadeIn', 'fadeOut')
+		setTimeout(() => element.className = className + ' hidden', 500)
+	}
+	fadeIn(element) {
+		let className = element.className
+		if (className.indexOf('hidden') === -1) {
+			return
+		}
+		if (className.indexOf('fadeIn') > -1) {
+			return
+		}
+		element.className = className.replace('hidden', 'fade fadeOut')
+		setTimeout(() => element.className = element.className.replace('fadeOut', 'fadeIn'), 0)
+		setTimeout(() => element.className = className.replace('hidden', ''), 500)
+	}
+	blink(element) {
+		let className = element.className
+		if (className.indexOf('hidden') > -1) {
+			return
+		}
+		if (className.indexOf('fade') > -1) {
+			return
+		}
+
+		let newClassName = className + ' blink'
+		let count = 4
+		let timer = setInterval(() => {
+			element.className = newClassName + ' fade60'
+			setTimeout(() => element.className = newClassName, 100)
+			count --
+			if (count <= 0) {
+				clearInterval(timer)
+				element.className = className
+			}
+		}, 200)
+	}
+	foreach(arr, callback) {
+		for (let i = 0, len = arr.length; i < len; i ++) {
+			if (callback(arr[i], i, arr) === false) return
+		}
+	}
+	merge(obj1, obj2) {
+		for (let key in obj2) {
+			if (obj2.hasOwnProperty(key)) {
+				let value = obj2[key]
+				obj1[key] = value
+			}
+		}
+		return obj1
 	}
 }

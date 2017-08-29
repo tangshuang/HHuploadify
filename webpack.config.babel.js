@@ -4,7 +4,9 @@ import Bufferify from 'webpack-bufferify'
 
 class UseModuleWithDefault extends Bufferify {
   process(content) {
-    return content.substring(0, content.length - 1) + '.default;'
+    return content + `
+      window["HHuploadify"] = window["HHuploadify"].default;
+    `
   }
 }
 

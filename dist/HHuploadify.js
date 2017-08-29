@@ -61,7 +61,7 @@ window["HHuploadify"] =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -69,60 +69,10 @@ window["HHuploadify"] =
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = foreach;
-/* harmony export (immutable) */ __webpack_exports__["d"] = invoke;
-/* harmony export (immutable) */ __webpack_exports__["e"] = merge;
-/* harmony export (immutable) */ __webpack_exports__["c"] = getImageFakeSize;
-/* harmony export (immutable) */ __webpack_exports__["b"] = getFileName;
-function foreach(arr, callback) {
-	for (var i = 0, len = arr.length; i < len; i++) {
-		if (callback(arr[i], i, arr) === false) return;
-	}
-}
-function invoke(factory) {
-	if (typeof factory === 'function') {
-		for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-			args[_key - 1] = arguments[_key];
-		}
-
-		factory.apply(undefined, args);
-	}
-}
-function merge(obj1, obj2) {
-	for (var key in obj2) {
-		var value = obj2[key];
-		obj1[key] = value;
-	}
-	return obj1;
-}
-function getImageFakeSize(file) {
-	var el = document.createElement('img');
-	el.style.postion = 'fixed';
-	el.style.top = -1000000 + 'px';
-	el.src = file;
-	document.body.appendChild(el);
-	var w = el.clientWidth;
-	var h = el.clientHeight;
-	document.body.removeChild(el);
-	return w * h;
-}
-function getFileName(file) {
-	var eos = file.indexOf(':\\') > -1 ? '\\' : '/';
-	return file.split(eos).pop();
-}
-
-/***/ }),
-/* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(0);
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
 
 var _class = function () {
 	function _class() {
@@ -178,7 +128,7 @@ var _class = function () {
 			onDestroy: null, // when all resource removed
 			onReset: null // when after reset done
 		};
-		this.options = Object(__WEBPACK_IMPORTED_MODULE_0__functions__["e" /* merge */])(defaults, options);
+		this.options = this.merge(defaults, options);
 
 		// force to choose only one file
 		if (this.options.single) {
@@ -191,18 +141,30 @@ var _class = function () {
 		this.init();
 		this.events();
 
+		var appVersion = window.navigator.appVersion;
+		this.isSupported = !(appVersion.indexOf('MSIE') > -1 && appVersion.indexOf('MSIE 10') === -1);
+		if (!this.isSupported) {
+			options.multiple = false;
+			options.showPreview = 1;
+			console.error('Browser not supported!', appVersion);
+		}
+
 		return this;
 	}
 
 	_createClass(_class, [{
 		key: 'init',
 		value: function init() {
+			var _this = this;
+
 			var id = this.id;
 			var options = this.options;
-			var inputHTML = '\n\t\t\t<input id="uploadify-input-' + id + '"\n\t\t\t\tclass="uploadify-input"\n\t\t\t\tstyle="display:none"\n\t\t\t\ttype="file"\n\t\t\t\tname="uploadifyfile[]"\n\t\t\t\t' + (options.multiple ? 'multiple' : '') + '\n\t\t\t\taccept="' + options.fileTypeExts + '"\n\t\t\t\t>\n\t\t\t<a id="uploadify-choose-button-' + id + '"\n\t\t\t\thref="javascript:void(0)"\n\t\t\t\tclass="uploadify-choose-button"\n\t\t\t\t>\n\t\t\t\t<span>' + options.chooseText + '</span>\n\t\t\t</a>\n\t\t';
-			var uploadHTML = '\n\t\t\t<a id="uploadify-upload-button-' + id + '"\n\t\t\t\thref="javascript:void(0)"\n\t\t\t\tclass="uploadify-upload-button"\n\t\t\t\tstyle="display:none"\n\t\t\t\t>\n\t\t\t\t<span>' + options.uploadText + '</span>\n\t\t\t</a>\n\t\t';
+			var inputHTML = '\n\t\t\t<input id="uploadify-input-' + id + '"\n\t\t\t\tclass="uploadify-input"\n\t\t\t\tstyle="display:none"\n\t\t\t\ttype="file"\n\t\t\t\tname="uploadifyfile[]"\n\t\t\t\t' + (options.multiple ? 'multiple' : '') + '\n\t\t\t\taccept="' + options.fileTypeExts + '"\n\t\t\t\t>\n\t\t';
+			var chooseHTML = '\n\t\t\t<a id="uploadify-choose-button-' + id + '"\n\t\t\t\thref="javascript:void(0)"\n\t\t\t\tclass="uploadify-choose-button"\n\t\t\t\t>\n\t\t\t\t<span>' + options.chooseText + '</span>\n\t\t\t</a>\n\t\t';
+			var uploadHTML = '\n\t\t\t<a id="uploadify-upload-button-' + id + '"\n\t\t\t\thref="javascript:void(0)"\n\t\t\t\tclass="uploadify-upload-button hidden"\n\t\t\t\t>\n\t\t\t\t<span>' + options.uploadText + '</span>\n\t\t\t</a>\n\t\t';
+			var errorHTML = '\n\t\t\t<span id="uploadify-error-' + id + '" class="uploadify-error hidden"><span class="uploadify-error-container"><span class="uploadify-error-msg"></span></span></span>\n\t\t';
 			var queueHTML = '\n\t\t\t<span id="uploadify-queue-' + id + '" class="uploadify-queue"></span>\n\t\t';
-			var sectionHTML = '\n\t\t\t<span class="uploadify">\n\t\t\t\t' + queueHTML + '\n\t\t\t\t' + inputHTML + '\n\t\t\t\t' + uploadHTML + '\n\t\t\t</span>\n\t\t';
+			var sectionHTML = '\n\t\t\t<span class="uploadify">\n\t\t\t\t' + queueHTML + '\n\t\t\t\t' + chooseHTML + '\n\t\t\t\t' + uploadHTML + '\n\t\t\t\t' + errorHTML + '\n\t\t\t\t' + inputHTML + '\n\t\t\t</span>\n\t\t';
 
 			this.container = document.getElementById(options.container.replace('#', ''));
 			var container = this.container;
@@ -212,11 +174,22 @@ var _class = function () {
 			this.chooseButton = container.getElementsByClassName('uploadify-choose-button')[0];
 			this.uploadButton = container.getElementsByClassName('uploadify-upload-button')[0];
 
+			this.resetInput = function () {
+				var el = document.createElement('div');
+				el.innerHTML = inputHTML;
+				var input = el.children[0];
+				var wrapper = container.children[0];
+				_this.input = input;
+				input.parentNode.removeChild(input);
+				wrapper.appendChild(input);
+				input.onchange = _this.onSelectFiles.bind(_this);
+			};
+
 			if (options.auto) {
-				this.uploadButton.style.display = 'none';
+				this.hide(this.uploadButton);
 			}
 
-			Object(__WEBPACK_IMPORTED_MODULE_0__functions__["d" /* invoke */])(options.onInit);
+			this.invoke(options.onInit);
 
 			if (options.files instanceof Array && options.files.length > 0) {
 				this.reset(options.files);
@@ -225,83 +198,111 @@ var _class = function () {
 	}, {
 		key: 'events',
 		value: function events() {
-			var _this = this;
+			var _this2 = this;
 
 			this.input.onchange = this.onSelectFiles.bind(this);
 			this.uploadButton.onclick = this.onClickUpload.bind(this);
 			this.chooseButton.onclick = function () {
-				_this.input.click();
+				_this2.input.click();
 			};
 		}
 	}, {
 		key: 'onSelectFiles',
 		value: function onSelectFiles() {
-			var _this2 = this;
+			var _this3 = this;
+
+			var options = this.options;
+			if (!options.multiple && this.files.filter(function (item) {
+				return item.status < 2;
+			}).length > 0) {
+				this.showError('Waiting upload!');
+				return;
+			}
 
 			var files = this.getSelectedFiles();
 			var count = this.getExistsFilesCount();
-			var options = this.options;
 
-			Object(__WEBPACK_IMPORTED_MODULE_0__functions__["a" /* foreach */])(files, function (file) {
+			this.foreach(files, function (file) {
 				file.index = ++count;
 				file.status = 0; // not begin to upload
 			});
 
-			Object(__WEBPACK_IMPORTED_MODULE_0__functions__["d" /* invoke */])(options.onSelect, files);
+			this.invoke(options.onSelect, files, this.files);
 
 			var existsCount = this.files.length;
 
-			Object(__WEBPACK_IMPORTED_MODULE_0__functions__["a" /* foreach */])(files, function (file) {
-				_this2.appendFile(file);
+			this.foreach(files, function (file) {
+				_this3.appendFile(file);
 				if (options.auto) {
-					_this2.uploadFile(file);
+					_this3.uploadFile(file);
 				}
 			});
 
 			var finalCount = this.files.length;
 
 			if (options.single) {
-				this.chooseButton.style.display = 'none';
+				this.hide(this.chooseButton);
 			}
 
 			if (!options.auto && finalCount > existsCount) {
-				this.uploadButton.style.display = 'block';
+				this.fadeIn(this.uploadButton);
 			}
-
-			this.input.value = '';
+		}
+	}, {
+		key: 'getImageFakeSize',
+		value: function getImageFakeSize(file) {
+			var el = document.createElement('img');
+			el.style.postion = 'fixed';
+			el.style.top = -1000000 + 'px';
+			el.src = file;
+			document.body.appendChild(el);
+			var w = el.clientWidth;
+			var h = el.clientHeight;
+			document.body.removeChild(el);
+			return w * h;
+		}
+	}, {
+		key: 'getFileName',
+		value: function getFileName(file) {
+			var eos = file.indexOf(':\\') > -1 ? '\\' : '/';
+			return file.split(eos).pop();
 		}
 	}, {
 		key: 'getSelectedFiles',
 		value: function getSelectedFiles() {
-			var _this3 = this;
+			var _this4 = this;
 
-			var files = this.input.files;
-			// < IE 10, only one can be selected
-			if (files === undefined) {
-				files = this.input.value.split(',').map(function (item) {
-					var src = item.trim();
-					var file = {
-						path: src,
-						name: Object(__WEBPACK_IMPORTED_MODULE_0__functions__["b" /* getFileName */])(src),
-						size: Object(__WEBPACK_IMPORTED_MODULE_0__functions__["c" /* getImageFakeSize */])(src)
-					};
-					return file;
-				});
-			}
+			var files = this.isSupported ? this.input.files : this.input.value.split(',').map(function (item) {
+				var src = item.trim();
+				var file = {
+					path: src,
+					name: _this4.getFileName(src),
+					size: _this4.getImageFakeSize(src)
+				};
+				return file;
+			});
 
 			var options = this.options;
 			var arr = [];
 			var typeArray = options.fileTypeExts.split(',');
 
-			Object(__WEBPACK_IMPORTED_MODULE_0__functions__["a" /* foreach */])(files, function (file) {
+			this.foreach(files, function (file) {
 				if (typeArray.indexOf(file.name.split('.').pop()) === -1) {
-					Object(__WEBPACK_IMPORTED_MODULE_0__functions__["d" /* invoke */])(options.onSelectError, 1, file);
+					_this4.showError('Type Error!');
+					_this4.invoke(options.onSelectError, 1, file);
 					console.error(file.name + '\'s file type is not allowed!');
-				} else if (parseInt(_this3.formatFileSize(file.size, true)) > options.fileSizeLimit) {
-					Object(__WEBPACK_IMPORTED_MODULE_0__functions__["d" /* invoke */])(options.onSelectError, 2, file);
+				} else if (parseInt(_this4.formatFileSize(file.size, true)) > options.fileSizeLimit) {
+					_this4.showError('Size Limit!');
+					_this4.invoke(options.onSelectError, 2, file);
 					console.error(file.name + '\'s file size is over limited!');
-				} else if (_this3.isFileExists(file)) {
-					Object(__WEBPACK_IMPORTED_MODULE_0__functions__["d" /* invoke */])(options.onSelectError, 3, file);
+				} else if (_this4.isFileExists(file)) {
+					_this4.showError('File(s) Exists!');
+
+					var existsFile = _this4.isFileExists(file);
+					var element = existsFile.element;
+					_this4.blink(element);
+
+					_this4.invoke(options.onSelectError, 3, file);
 					console.error(file.name + ' is in selected list.');
 				} else {
 					arr.push(file);
@@ -314,9 +315,9 @@ var _class = function () {
 		key: 'isFileExists',
 		value: function isFileExists(file) {
 			var flag = false;
-			Object(__WEBPACK_IMPORTED_MODULE_0__functions__["a" /* foreach */])(this.files, function (f) {
+			this.foreach(this.files, function (f, i) {
 				if (f.name === file.name && f.size === file.size) {
-					flag = true;
+					flag = f;
 				}
 			});
 			return flag;
@@ -350,20 +351,15 @@ var _class = function () {
 	}, {
 		key: 'appendFile',
 		value: function appendFile(file) {
-			var _this4 = this;
+			var _this5 = this;
 
 			var src = void 0;
 			if (this.options.showPreview) {
-				// chrome
-				if (window.navigator.userAgent.toLowerCase().indexOf("chrome") >= 1) {
+				if (typeof window.URL !== 'undefined') {
 					src = window.URL.createObjectURL(file);
+				} else {
+					src = 'file:///' + file.path.replace(/\\/g, '/');
 				}
-				// firefox
-				else if (window.navigator.userAgent.toLowerCase().indexOf("firefox") >= 1) {
-						src = window.URL.createObjectURL(file);
-					} else {
-						src = file.path;
-					}
 			}
 			var template = this.options.template;
 			var html = template.replace(/\{queueId}/g, this.id).replace(/\{fileId}/g, file.index);
@@ -380,7 +376,7 @@ var _class = function () {
 
 			file.element = element;
 			file.element.getElementsByClassName('uploadify-item-delete')[0].onclick = function (e) {
-				_this4.onClickDelete(element, e.target);
+				_this5.onClickDelete(element, e.target);
 			};
 
 			this.files.push(file);
@@ -388,7 +384,80 @@ var _class = function () {
 	}, {
 		key: 'uploadFile',
 		value: function uploadFile(file) {
-			var _this5 = this;
+			this.isSupported ? this.uploadFileByXHR(file) : this.uploadFileByIFrame(file);
+			this.resetInput();
+		}
+	}, {
+		key: 'uploadFileByIFrame',
+		value: function uploadFileByIFrame(file) {
+			var _this6 = this;
+
+			if (file.status !== 0) {
+				return;
+			}
+			var id = this.id;
+			var options = this.options;
+			var f = document.createElement('div');
+			f.style.position = 'absolute';
+			f.style.top = '-1000px';
+			f.style.left = '-1000px';
+			f.style.height = '1px';
+			f.style.overflow = 'auto';
+			f.innerHTML = '\n\t\t\t<form action="' + options.url + '" method="' + options.method + '" target="upload-iframe-' + id + '-' + file.index + '" enctype="multipart/form-data">\n\t\t\t\t<button type="submit"></button>\n\t\t\t</form>\n\t\t\t<iframe name="upload-iframe-' + id + '-' + file.index + '"></iframe>\n\t\t';
+			f.getElementsByTagName('form')[0].appendChild(this.input);
+
+			var iframe = f.getElementsByTagName('iframe')[0];
+			var iframeOnload = function iframeOnload(isTimeout) {
+				if (file.status !== 1) {
+					return;
+				}
+				if (isTimeout === 'timeout') {
+					file.status = 4;
+					_this6.invoke(options.onUploadError, file, 'timeout');
+					file.element.className += ' error';
+				} else {
+					var responseDoc = iframe.contentDocument || iframe.contentWindow.document;
+					var responseText = responseDoc.body.children[0].innerText;
+
+					file.status = 2;
+					_this6.invoke(options.onUploadSuccess, file, responseText);
+
+					file.element.getElementsByClassName('uploadify-item-container')[0].removeChild(file.element.getElementsByClassName('uploadify-item-progress')[0]);
+					file.element.className += ' success';
+
+					if (options.showPreview > 1) {
+						var data = JSON.parse(responseText);
+						if (data && data[options.showPreviewField]) {
+							file.element.style.backgroundImage = 'url(' + data[options.showPreviewField] + ')';
+						}
+					}
+				}
+
+				_this6.invoke(options.onUploadComplete);
+
+				if (_this6.files.filter(function (file) {
+					return file.status < 2;
+				}).length === 0) {
+					_this6.invoke(options.onQueueComplete);
+				}
+			};
+			if (window.addEventListener) {
+				iframe.addEventListener('load', iframeOnload, false);
+			} else {
+				iframe.attachEvent('onload', iframeOnload);
+			}
+
+			document.body.appendChild(f);
+			f.getElementsByTagName('button')[0].click();
+
+			file.status = 1;
+			file.iframe = iframe.parentNode;
+			this.invoke(options.onUploadStart, file);
+		}
+	}, {
+		key: 'uploadFileByXHR',
+		value: function uploadFileByXHR(file) {
+			var _this7 = this;
 
 			if (file.status !== 0) {
 				return;
@@ -397,16 +466,21 @@ var _class = function () {
 			var options = this.options;
 			var xhr = new XMLHttpRequest();
 
-			xhr.upload.onprogress = function (e) {
-				_this5.onProgress(file, e.loaded, e.total);
-			};
+			if (xhr.upload) {
+				xhr.upload.onprogress = function (e) {
+					_this7.onProgress(file, e.loaded, e.total);
+				};
+			}
 
 			xhr.onreadystatechange = function (e) {
+				if (file.status !== 1) {
+					return;
+				}
 				if (xhr.readyState == 4) {
 					if (xhr.status == 200) {
 						file.status = 2;
 
-						Object(__WEBPACK_IMPORTED_MODULE_0__functions__["d" /* invoke */])(options.onUploadSuccess, file, xhr.responseText);
+						_this7.invoke(options.onUploadSuccess, file, xhr.responseText);
 
 						file.element.getElementsByClassName('uploadify-item-container')[0].removeChild(file.element.getElementsByClassName('uploadify-item-progress')[0]);
 						file.element.className += ' success';
@@ -419,24 +493,30 @@ var _class = function () {
 						}
 					} else {
 						file.status = 3;
-						Object(__WEBPACK_IMPORTED_MODULE_0__functions__["d" /* invoke */])(options.onUploadError, file, xhr.responseText);
+						_this7.invoke(options.onUploadError, file, xhr.responseText);
 						file.element.className += ' error';
 					}
 
-					Object(__WEBPACK_IMPORTED_MODULE_0__functions__["d" /* invoke */])(options.onUploadComplete);
+					_this7.invoke(options.onUploadComplete);
 
-					if (_this5.files.filter(function (file) {
+					if (_this7.files.filter(function (file) {
 						return file.status < 2;
 					}).length === 0) {
-						Object(__WEBPACK_IMPORTED_MODULE_0__functions__["d" /* invoke */])(options.onQueueComplete);
+						_this7.invoke(options.onQueueComplete);
 					}
 				}
 			};
 
 			xhr.open(options.method, options.url, true);
 			xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-			var fd = new FormData();
-			fd.append(options.field, file);
+			var fd = void 0;
+			if (typeof FormData === 'undefined') {
+				fd = [];
+				fd.push(options.field, file);
+			} else {
+				fd = new FormData();
+				fd.append(options.field, file);
+			}
 			var data = options.data;
 			if (data) {
 				for (var key in data) {
@@ -447,7 +527,7 @@ var _class = function () {
 
 			file.status = 1;
 			file.xhr = xhr;
-			Object(__WEBPACK_IMPORTED_MODULE_0__functions__["d" /* invoke */])(options.onUploadStart, file);
+			this.invoke(options.onUploadStart, file);
 		}
 	}, {
 		key: 'onProgress',
@@ -474,12 +554,13 @@ var _class = function () {
 	}, {
 		key: 'onClickUpload',
 		value: function onClickUpload() {
-			var _this6 = this;
+			var _this8 = this;
 
-			Object(__WEBPACK_IMPORTED_MODULE_0__functions__["a" /* foreach */])(this.files, function (file) {
-				return _this6.uploadFile(file);
+			this.foreach(this.files, function (file) {
+				return _this8.uploadFile(file);
 			});
-			this.uploadButton.style.display = 'none';
+			this.fadeOut(this.uploadButton);
+			this.resetInput();
 		}
 	}, {
 		key: 'onClickDelete',
@@ -488,33 +569,38 @@ var _class = function () {
 			var file = this.getFileByIndex(fileid);
 			if (file.xhr) {
 				file.xhr.abort();
-				Object(__WEBPACK_IMPORTED_MODULE_0__functions__["d" /* invoke */])(this.onUploadCancel, file);
+				this.invoke(this.options.onUploadCancel, file);
+			}
+			if (file.iframe) {
+				document.body.removeChild(file.iframe);
+				this.invoke(this.options.onUploadCancel, file);
 			}
 
 			this.queue.removeChild(element);
 			this.files.splice(this.files.indexOf(file), 1);
-			Object(__WEBPACK_IMPORTED_MODULE_0__functions__["d" /* invoke */])(this.onRemoved, file);
+			this.resetInput();
+			this.invoke(this.options.onRemoved, file);
 
 			if (this.files.length === 0) {
-				this.uploadButton.style.display = 'none';
+				this.fadeOut(this.uploadButton);
 			}
 
 			if (this.options.single) {
-				this.chooseButton.style.display = 'block';
+				this.show(this.chooseButton);
 			}
 		}
 	}, {
 		key: 'reset',
 		value: function reset(files) {
-			var _this7 = this;
+			var _this9 = this;
 
 			var template = this.options.template;
 			var id = this.idea;
 
 			this.queue.innerHTML = '';
 
-			Object(__WEBPACK_IMPORTED_MODULE_0__functions__["a" /* foreach */])(files, function (file, index) {
-				var tpl = template.replace(/\{queueId}/g, _this7.id).replace(/\{fileId}/g, index + 1);
+			this.foreach(files, function (file, index) {
+				var tpl = template.replace(/\{queueId}/g, _this9.id).replace(/\{fileId}/g, index + 1);
 				var el = document.createElement('div');
 				el.innerHTML = tpl;
 				var element = el.children[0];
@@ -522,21 +608,133 @@ var _class = function () {
 				element.style.backgroundImage = 'url(' + file.path + ')';
 				element.style.backgroundSize = 'cover';
 
-				_this7.queue.appendChild(element);
+				_this9.queue.appendChild(element);
 
 				file.element = element;
 				file.element.getElementsByClassName('uploadify-item-delete')[0].onclick = function (e) {
-					_this7.onClickDelete(element, e.target);
+					_this9.onClickDelete(element, e.target);
 				};
 
 				file.index = index + 1;
 				file.status = 2;
-				file.name = file.name || Object(__WEBPACK_IMPORTED_MODULE_0__functions__["b" /* getFileName */])(file.path);
-				file.size = file.size || Object(__WEBPACK_IMPORTED_MODULE_0__functions__["c" /* getImageFakeSize */])(file.path);
-				_this7.files.push(file);
+				file.name = file.name || _this9.getFileName(file.path);
+				file.size = file.size || _this9.getImageFakeSize(file.path);
+				_this9.files.push(file);
 			});
 
-			Object(__WEBPACK_IMPORTED_MODULE_0__functions__["d" /* invoke */])(this.onReset);
+			this.invoke(this.options.onReset);
+		}
+	}, {
+		key: 'showError',
+		value: function showError(msg) {
+			var _this10 = this;
+
+			var errorEl = this.container.getElementsByClassName('uploadify-error')[0];
+			errorEl.getElementsByClassName('uploadify-error-msg')[0].innerText = msg;
+			this.fadeIn(errorEl);
+			setTimeout(function () {
+				return _this10.fadeOut(errorEl);
+			}, 1500);
+		}
+		// =============== functions ================
+
+	}, {
+		key: 'invoke',
+		value: function invoke(factory) {
+			if (typeof factory === 'function') {
+				for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+					args[_key - 1] = arguments[_key];
+				}
+
+				factory.apply(this, args);
+			}
+		}
+	}, {
+		key: 'hide',
+		value: function hide(element) {
+			var className = element.className;
+			if (className.indexOf('hidden') === -1) {
+				element.className += ' hidden';
+			}
+		}
+	}, {
+		key: 'show',
+		value: function show(element) {
+			element.className = element.className.replace('hidden', '');
+		}
+	}, {
+		key: 'fadeOut',
+		value: function fadeOut(element) {
+			var className = element.className;
+			if (className.indexOf('hidden') > -1) {
+				return;
+			}
+			element.className += ' fade fadeIn';
+			element.className = element.className.replace('fadeIn', 'fadeOut');
+			setTimeout(function () {
+				return element.className = className + ' hidden';
+			}, 500);
+		}
+	}, {
+		key: 'fadeIn',
+		value: function fadeIn(element) {
+			var className = element.className;
+			if (className.indexOf('hidden') === -1) {
+				return;
+			}
+			if (className.indexOf('fadeIn') > -1) {
+				return;
+			}
+			element.className = className.replace('hidden', 'fade fadeOut');
+			setTimeout(function () {
+				return element.className = element.className.replace('fadeOut', 'fadeIn');
+			}, 0);
+			setTimeout(function () {
+				return element.className = className.replace('hidden', '');
+			}, 500);
+		}
+	}, {
+		key: 'blink',
+		value: function blink(element) {
+			var className = element.className;
+			if (className.indexOf('hidden') > -1) {
+				return;
+			}
+			if (className.indexOf('fade') > -1) {
+				return;
+			}
+
+			var newClassName = className + ' blink';
+			var count = 4;
+			var timer = setInterval(function () {
+				element.className = newClassName + ' fade60';
+				setTimeout(function () {
+					return element.className = newClassName;
+				}, 100);
+				count--;
+				if (count <= 0) {
+					clearInterval(timer);
+					element.className = className;
+				}
+			}, 200);
+		}
+	}, {
+		key: 'foreach',
+		value: function foreach(arr, callback) {
+			for (var i = 0, len = arr.length; i < len; i++) {
+				if (callback(arr[i], i, arr) === false) return;
+			}
+		}
+	}, {
+		key: 'merge',
+		value: function merge(obj1, obj2) {
+			for (var key in obj2) {
+				if (obj2.hasOwnProperty(key)) {
+					var value = obj2[key];
+					obj1[key] = value;
+				}
+			}
+			return obj1;
 		}
 	}]);
 
@@ -546,4 +744,6 @@ var _class = function () {
 /* harmony default export */ __webpack_exports__["default"] = (_class);
 
 /***/ })
-/******/ ]).default;
+/******/ ]);
+      window["HHuploadify"] = window["HHuploadify"].default;
+    

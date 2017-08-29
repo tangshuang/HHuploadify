@@ -17,12 +17,10 @@
 </style>
 
 <script src="../dist/HHuploadify.js"></script>
-<script>
-window.HHuploadify = window.HHuploadify.default
-</script>
 
 <p>It is easy for you to extend more feature by using HHuploadify.</p>
 
+<h4>Two certain uploader:</h4>
 <span id="item1"></span>
 <span id="item2"></span>
 <script>
@@ -53,5 +51,38 @@ new HHuploadify({
   single: true,
   chooseText: 'Item2',
   template: render('Item2 Title'),
+})
+</script>
+
+<div class="clear"></div>
+
+<h4>Multiple Select, but Only 4 finally:</h4>
+<div id="upload2"></div>
+<script>
+new HHuploadify({
+	container: '#upload2',
+	url: '/upload',
+  auto: true,
+  onSelect(files, exists) {
+    if (files.length + exists.length >= 4) {
+      if (exists.length > 4) {
+        while (files.length) {
+          files.pop()
+        }
+        while (exists.length > 4) {
+          exists.pop()
+        }
+      }
+      else {
+        while (files.length + exists.length > 4) {
+          files.pop()
+        }
+      }
+      this.hide(this.chooseButton)
+    }
+  },
+  onRemoved() {
+    this.show(this.chooseButton)
+  },
 })
 </script>

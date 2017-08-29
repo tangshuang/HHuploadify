@@ -1,7 +1,7 @@
 {
-  "name": "uploadify",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "hhuploadify",
+  "version": "0.1.0",
+  "main": "src/HHuploadify.js",
   "scripts": {
     "start": "node server.js",
     "build": "webpack"
@@ -14,6 +14,7 @@
     "babel-preset-env": "^1.6.0",
     "babel-register": "^6.26.0",
     "express": "^4.15.4",
+    "express-fileupload": "^0.2.0",
     "fs-extra": "^4.0.1",
     "open": "0.0.5",
     "webpack": "^3.5.5",

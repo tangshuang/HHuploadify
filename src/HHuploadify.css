@@ -2,9 +2,40 @@
 	clear: both;
 	font-size: 12px;
 }
+.uploadify .hidden {
+	display: none;
+}
+.uploadify .fade {
+	transition: opacity .5s;
+}
+.uploadify .blink {
+	transition: opacity .1s;
+}
+.uploadify .fadeIn {
+	opacity: 1;
+}
+.uploadify .fadeOut {
+	opacity: 0;
+}
+.uploadify .fade80 {
+	opacity: 0.8;
+}
+.uploadify .fade60 {
+	opacity: 0.6;
+}
+.uploadify .fade50 {
+	opacity: 0.5;
+}
+.uploadify .fade40 {
+	opacity: 0.4;
+}
+.uploadify .fade20 {
+	opacity: 0.2;
+}
 .uploadify-item,
 .uploadify-choose-button,
-.uploadify-upload-button {
+.uploadify-upload-button,
+.uploadify-error {
 	display: block;
 	position: relative;
 	float: left;
@@ -47,7 +78,7 @@
 	left: 0;
 	top: 0;
 
-	background-color: rgba(0,0,0,.6);
+	background-color: rgba(0,0,0,.3);
 	transition: background-color .3s;
 }
 .uploadify-queue .uploadify-item.success .uploadify-item-container {
@@ -106,4 +137,20 @@
 	margin-top: -.5em;
 	text-align: center;
 	color: #fff;
+}
+
+.uploadify-error {
+	background-color: #ffeeee;
+	border-color: #ff7b7b;
+	color: #ff7b7b;
+}
+.uploadify-error-container {
+	display: table;
+	width: 100%;
+	height: 100%;
+}
+.uploadify-error-msg {
+	display: table-cell;
+	vertical-align:middle;
+  text-align:center;
 }

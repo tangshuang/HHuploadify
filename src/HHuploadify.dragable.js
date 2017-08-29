@@ -1,5 +1,4 @@
 import HHuploadify from './HHuploadify'
-import {foreach, invoke, merge} from './functions'
 
 export default class extends HHuploadify {
   constructor(options) {
@@ -9,24 +8,27 @@ export default class extends HHuploadify {
       dragable: true,
     }
 
-    this.options = merge(defaults, this.options)
+    options = this.options = this.merge(defaults, this.options)
 
-    if (this.options.ingle) {
-      this.options.dragable = false
+    if (options.ingle) {
+      options.dragable = false
     }
 
-    let onQueueComplete = this.options.onQueueComplete
-    this.options.onQueueComplete = () => {
+    let onQueueComplete = options.onQueueComplete
+    options.onQueueComplete = () => {
       if (typeof onQueueComplete === 'function') {
         onQueueComplete()
       }
-      if (this.options.dragable) {
-        let $queue = $(this.options.container).find('.uploadify-queue')
+      if (options.dragable) {
+        let $queue = $(options.container).find('.uploadify-queue')
         $queue.find('.uploadify-item').addClass('dragable')
         $queue.dragsort({
           dragSelector: '.uploadify-item',
           placeHolderTemplate: '<span class="uploadify-item drag-placeholder"></span>',
           dragBetween: true,
+          dragEnd: () => {
+            this.invoke(options.onDragEnd)
+          },
         })
       }
     }

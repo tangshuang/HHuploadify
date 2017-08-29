@@ -40,6 +40,19 @@ new HHuploadify({
 })
 </script>
 
+<h4 class="clear">Use server side response image:</h4>
+<div id="upload30"></div>
+<script>
+new HHuploadify({
+	container: '#upload30',
+	url: '/upload',
+  auto: true,
+  single: true,
+  chooseText: 'Photo',
+  showPreview: 2,
+})
+</script>
+
 <h4 class="clear">process percent:</h4>
 <div id="upload4"></div>
 <script>
@@ -65,7 +78,7 @@ new HHuploadify({
 <h4 class="clear">Reset Images:</h4>
 <div id="upload6"></div>
 <script>
-let that = new HHuploadify({
+new HHuploadify({
 	container: '#upload6',
 	url: '/upload',
   auto: true,
@@ -74,11 +87,11 @@ let that = new HHuploadify({
       path: 'http://wx3.sinaimg.cn/mw690/68a0d5e5gy1fcsbq3vrwgj20qo0zkgo5.jpg'
     },
     {
-      path: 'http://wx2.sinaimg.cn/mw690/68a0d5e5gy1fcsbqgeyjwj21i01i07wh.jpg',
+      path: 'http://wx2.sinaimg.cn/mw690/68a0d5e5gy1fcsbqgeyjwj21i01i07wh.jpg'
     },
     {
-      path: 'http://wx2.sinaimg.cn/mw690/68a0d5e5gy1fcsbq8g01sj22c03404qs.jpg',
-    },
+      path: 'http://wx2.sinaimg.cn/mw690/68a0d5e5gy1fcsbq8g01sj22c03404qs.jpg'
+    }
   ],
 })
 </script>

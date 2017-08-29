@@ -1,8 +1,6 @@
 # HHuploadify
 
-![screenshot](https://github.com/tangshuang/HHuploadify/blob/master/screenshot.png?raw=true)
-
-HHuploadify is a plugin to help deverloper to build a image uploader quickly.
+HHuploadify is a plugin to help developer to build a image uploader quickly.
 It's on the shoulder of Huploadify which is based on uploadify.
 But it's different from the other two:
 
@@ -11,6 +9,10 @@ But it's different from the other two:
 * auto upload
 * preview before/during upload
 * easy to extend
+
+![screenshot](https://github.com/tangshuang/HHuploadify/blob/master/screenshot.png?raw=true)
+
+Browsers <=IE8 are not supported. IE9 is partly supported, may have some bugs.
 
 ## Install
 
@@ -26,6 +28,17 @@ or with es6 module & webpack:
 import './src/HHuploadify.css'
 import HHuploadify from './src/HHuploadify'
 ```
+
+using npm:
+
+```
+npm install --save hhuploadify
+```
+
+```
+import HHuploadify from 'HHuploadify' // es6
+```
+
 
 then:
 
@@ -114,7 +127,9 @@ npm start
 ```
 
 Browser will be open and you can try it.
-You'd better to change network throttling by using browser deverloper tool.
+You'd better to change network throttling by using browser developer tool.
+
+We use babel & webpack to build the component, if you want to develop on it, please send a pull request.
 
 ## Dragable
 
@@ -183,5 +198,19 @@ new HHuploadify({
 
 Then when the instance created, there will be two default pictures in your list.
 You can look up this in demo.
+
+**Q: what should I return from server side?**
+
+A: because IE9 do not support `FromData`, I use iframe instead, which is not support json directly, so you should use `Content-Type: text/plain` in your response header.
+
+Data structure is json(text):
+
+```
+{
+  url: "xxx"
+}
+```
+
+You can use your own fields, it is based on yourself.
 
 More questions, submit an issue.
