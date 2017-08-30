@@ -36,7 +36,7 @@ npm install --save hhuploadify
 ```
 
 ```
-import HHuploadify from 'HHuploadify' // es6
+import HHuploadify from 'hhuploadify' // es6
 ```
 
 
