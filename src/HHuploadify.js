@@ -1,4 +1,4 @@
-export default class {
+export default class HHuploadify {
 	constructor(options = {}) {
 		if (!options.container || options.container.indexOf('#') !== 0) {
 			throw new Error('The container field you passed into HHuploadify is not correct!')
@@ -57,41 +57,28 @@ export default class {
 		}
 		this.options = this.merge(defaults, options)
 
+		this.id = Date.now()
+		this.files = []
+
+		let appVersion = window.navigator.appVersion
+		this.isIE = appVersion.indexOf('MSIE') !== -1
+		this.isIE9 = this.isIE && appVersion.indexOf('MSIE 9') !== -1
+		this.isOldIE = this.isIE && appVersion.indexOf('MSIE 10') === -1 && appVersion.indexOf('MSIE 9') === -1
+
 		// force to choose only one file
 		if(this.options.single) {
 			this.options.multiple = false
 		}
-
-		this.id = Date.now()
-		this.files = []
+		if (this.isIE9) {
+			this.options.multiple = false
+		}
 
 		this.init()
 		this.events()
-
-		let appVersion = window.navigator.appVersion
-		this.isSupported = !(appVersion.indexOf('MSIE') > -1 && appVersion.indexOf('MSIE 10') === -1)
-		if (!this.isSupported) {
-			options.multiple = false
-			options.showPreview = 1
-			console.error('Browser not supported!', appVersion)
-		}
-
-		return this
 	}
-
 	init() {
 		let id = this.id
 		let options = this.options
-		let inputHTML = `
-			<input id="uploadify-input-${id}"
-				class="uploadify-input"
-				style="display:none"
-				type="file"
-				name="uploadifyfile[]"
-				${options.multiple ? 'multiple' : ''}
-				accept="${options.fileTypeExts}"
-				>
-		`
 		let chooseHTML = `
 			<a id="uploadify-choose-button-${id}"
 				href="javascript:void(0)"
@@ -120,28 +107,16 @@ export default class {
 				${chooseHTML}
 				${uploadHTML}
 				${errorHTML}
-				${inputHTML}
 			</span>
 		`
 
-		this.container = document.getElementById(options.container.replace('#', ''))
+		this.container = document.querySelector(options.container)
 		let container = this.container
 		container.innerHTML = sectionHTML
-		this.input = container.getElementsByClassName('uploadify-input')[0]
-		this.queue = container.getElementsByClassName('uploadify-queue')[0]
-		this.chooseButton = container.getElementsByClassName('uploadify-choose-button')[0]
-		this.uploadButton = container.getElementsByClassName('uploadify-upload-button')[0]
-
-		this.resetInput = () => {
-			let el = document.createElement('div')
-			el.innerHTML = inputHTML
-			let input = el.children[0]
-			let wrapper = container.children[0]
-			this.input = input
-			input.parentNode.removeChild(input)
-			wrapper.appendChild(input)
-			input.onchange = this.onSelectFiles.bind(this)
-		}
+		this.queue = container.querySelector('.uploadify-queue')
+		this.chooseButton = container.querySelector('.uploadify-choose-button')
+		this.uploadButton = container.querySelector('.uploadify-upload-button')
+		this.resetInput()
 
 		if (options.auto) {
 			this.hide(this.uploadButton)
@@ -152,16 +127,41 @@ export default class {
 		if (options.files instanceof Array && options.files.length > 0) {
 			this.reset(options.files)
 		}
+
+		if (this.isOldIE) {
+			this.showError('Browser Not Support!', true)
+		}
+	}
+	resetInput() {
+		let id = this.id
+		let options = this.options
+		let inputHTML = `
+			<input id="uploadify-input-${id}"
+				class="uploadify-input"
+				style="display:none"
+				type="file"
+				name="uploadifyfile[]"
+				${options.multiple ? 'multiple' : ''}
+				accept="${options.fileTypeExts}"
+				>
+		`
+		let el = document.createElement('div')
+		el.innerHTML = inputHTML
+		let input = el.children[0]
+		let wrapper = this.container.children[0]
+		input.parentNode.removeChild(input)
+		wrapper.appendChild(input)
+		input.onchange = () => this.onSelectFiles()
+		this.input = input
 	}
 	events() {
-		this.input.onchange = this.onSelectFiles.bind(this)
-		this.uploadButton.onclick = this.onClickUpload.bind(this)
-		this.chooseButton.onclick = () => {
-			this.input.click()
-		}
+		this.uploadButton.onclick = () => this.onClickUpload()
+		this.chooseButton.onclick = () => this.input.click()
 	}
 	onSelectFiles() {
 		let options = this.options
+
+		// if not multiple and there are some files are waiting for upload
 		if (!options.multiple && this.files.filter(item => item.status < 2).length > 0) {
 			this.showError('Waiting upload!')
 			return
@@ -212,17 +212,12 @@ export default class {
 		return file.split(eos).pop()
 	}
 	getSelectedFiles() {
-		let files = this.isSupported ?
-			this.input.files :
-			this.input.value.split(',').map(item => {
-				let src = item.trim()
-				let file = {
-					path: src,
-					name: this.getFileName(src),
-					size: this.getImageFakeSize(src),
-				}
-				return file
-			})
+		let inputValue = this.input.value
+		let files = this.isIE9 ? [{
+					path: inputValue,
+					name: this.getFileName(inputValue),
+					size: this.getImageFakeSize(inputValue),
+				}] : this.input.files
 
 		let options = this.options
 		let arr = []
@@ -266,7 +261,7 @@ export default class {
 		return flag
 	}
 	getExistsFilesCount() {
-		return this.queue.getElementsByClassName('uploadify-item').length
+		return this.files.length
 	}
 	formatFileSize(size, withKB) {
 	  if (size > 1024 * 1024 && !withKB) {
@@ -310,14 +305,14 @@ export default class {
 		this.queue.appendChild(element)
 
 		file.element = element
-		file.element.getElementsByClassName('uploadify-item-delete')[0].onclick = e => {
+		file.element.querySelector('.uploadify-item-delete').onclick = e => {
 			this.onClickDelete(element, e.target)
 		}
 
 		this.files.push(file)
 	}
 	uploadFile(file) {
-		this.isSupported ? this.uploadFileByXHR(file) : this.uploadFileByIFrame(file)
+		this.isIE9 ? this.uploadFileByIFrame(file) : this.uploadFileByXHR(file)
 		this.resetInput()
 	}
 	uploadFileByIFrame(file) {
@@ -338,9 +333,9 @@ export default class {
 			</form>
 			<iframe name="upload-iframe-${id}-${file.index}"></iframe>
 		`
-		f.getElementsByTagName('form')[0].appendChild(this.input)
+		f.querySelector('form').appendChild(this.input)
 
-		let iframe = f.getElementsByTagName('iframe')[0]
+		let iframe = f.querySelector('iframe')
 		let iframeOnload = (isTimeout) => {
 			if (file.status !== 1) {
 				return
@@ -351,21 +346,35 @@ export default class {
 				file.element.className += ' error'
 			}
 			else {
-				let responseDoc = iframe.contentDocument || iframe.contentWindow.document
-				let responseText = responseDoc.body.children[0].innerText
-
 				file.status = 2
-				this.invoke(options.onUploadSuccess, file, responseText)
-
-				file.element.getElementsByClassName('uploadify-item-container')[0].removeChild(file.element.getElementsByClassName('uploadify-item-progress')[0])
+				file.element.querySelector('.uploadify-item-container').removeChild(file.element.querySelector('.uploadify-item-progress'))
 				file.element.className += ' success'
 
-				if (options.showPreview > 1) {
-					let data = JSON.parse(responseText)
-					if (data && data[options.showPreviewField]) {
-						file.element.style.backgroundImage = `url(${data[options.showPreviewField]})`
+				let notify = () => {
+					let responseDoc = iframe.contentDocument || iframe.contentWindow.document
+					let responseText = responseDoc.body.children.length && responseDoc.body.children[0].innerText
+
+					if (responseText) {
+						this.invoke(options.onUploadSuccess, file, responseText)
+						if (options.showPreview > 1) {
+							let data = JSON.parse(responseText)
+							if (data && data[options.showPreviewField]) {
+								file.element.style.backgroundImage = `url(${data[options.showPreviewField]})`
+							}
+						}
 					}
+
+					return responseText
 				}
+
+				let count = 1
+				let timer = setInterval(() => {
+					let responseText = notify()
+					if (responseText || count === 10) {
+						clearInterval(timer)
+					}
+					count ++
+				}, 500)
 			}
 
 			this.invoke(options.onUploadComplete)
@@ -382,7 +391,7 @@ export default class {
     }
 
 		document.body.appendChild(f)
-		f.getElementsByTagName('button')[0].click()
+		f.querySelector('button').click()
 
 		file.status = 1
 		file.iframe = iframe.parentNode
@@ -412,7 +421,7 @@ export default class {
 
 					this.invoke(options.onUploadSuccess, file, xhr.responseText)
 
-					file.element.getElementsByClassName('uploadify-item-container')[0].removeChild(file.element.getElementsByClassName('uploadify-item-progress')[0])
+					file.element.querySelector('.uploadify-item-container').removeChild(file.element.querySelector('.uploadify-item-progress'))
 					file.element.className += ' success'
 
 					if (options.showPreview > 1) {
@@ -461,7 +470,7 @@ export default class {
 	}
 	onProgress(file, loaded, total) {
 		let percent = (loaded / total * 100).toFixed(2) +'%'
-		let processEl = file.element.getElementsByClassName('uploadify-item-progress')[0]
+		let processEl = file.element.querySelector('.uploadify-item-progress')
 		let html
 
 		switch (this.options.showUploadProcess) {
@@ -535,7 +544,7 @@ export default class {
 			this.queue.appendChild(element)
 
 			file.element = element
-			file.element.getElementsByClassName('uploadify-item-delete')[0].onclick = e => {
+			file.element.querySelector('.uploadify-item-delete').onclick = e => {
 				this.onClickDelete(element, e.target)
 			}
 
@@ -548,11 +557,13 @@ export default class {
 
 		this.invoke(this.options.onReset)
 	}
-	showError(msg) {
-		let errorEl = this.container.getElementsByClassName('uploadify-error')[0]
-		errorEl.getElementsByClassName('uploadify-error-msg')[0].innerText = msg
+	showError(msg, notDisappear = false) {
+		let errorEl = this.container.querySelector('.uploadify-error')
+		errorEl.querySelector('.uploadify-error-msg').innerText = msg
 		this.fadeIn(errorEl)
-		setTimeout(() => this.fadeOut(errorEl), 1500)
+		if (!notDisappear) {
+			setTimeout(() => this.fadeOut(errorEl), 1500)
+		}
 	}
 	// =============== functions ================
 	invoke(factory, ...args) {

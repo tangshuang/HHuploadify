@@ -74,11 +74,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var _class = function () {
-	function _class() {
+var HHuploadify = function () {
+	function HHuploadify() {
 		var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		_classCallCheck(this, _class);
+		_classCallCheck(this, HHuploadify);
 
 		if (!options.container || options.container.indexOf('#') !== 0) {
 			throw new Error('The container field you passed into HHuploadify is not correct!');
@@ -130,60 +130,44 @@ var _class = function () {
 		};
 		this.options = this.merge(defaults, options);
 
+		this.id = Date.now();
+		this.files = [];
+
+		var appVersion = window.navigator.appVersion;
+		this.isIE = appVersion.indexOf('MSIE') !== -1;
+		this.isIE9 = this.isIE && appVersion.indexOf('MSIE 9') !== -1;
+		this.isOldIE = this.isIE && appVersion.indexOf('MSIE 10') === -1 && appVersion.indexOf('MSIE 9') === -1;
+
 		// force to choose only one file
 		if (this.options.single) {
 			this.options.multiple = false;
 		}
-
-		this.id = Date.now();
-		this.files = [];
+		if (this.isIE9) {
+			this.options.multiple = false;
+		}
 
 		this.init();
 		this.events();
-
-		var appVersion = window.navigator.appVersion;
-		this.isSupported = !(appVersion.indexOf('MSIE') > -1 && appVersion.indexOf('MSIE 10') === -1);
-		if (!this.isSupported) {
-			options.multiple = false;
-			options.showPreview = 1;
-			console.error('Browser not supported!', appVersion);
-		}
-
-		return this;
 	}
 
-	_createClass(_class, [{
+	_createClass(HHuploadify, [{
 		key: 'init',
 		value: function init() {
-			var _this = this;
-
 			var id = this.id;
 			var options = this.options;
-			var inputHTML = '\n\t\t\t<input id="uploadify-input-' + id + '"\n\t\t\t\tclass="uploadify-input"\n\t\t\t\tstyle="display:none"\n\t\t\t\ttype="file"\n\t\t\t\tname="uploadifyfile[]"\n\t\t\t\t' + (options.multiple ? 'multiple' : '') + '\n\t\t\t\taccept="' + options.fileTypeExts + '"\n\t\t\t\t>\n\t\t';
 			var chooseHTML = '\n\t\t\t<a id="uploadify-choose-button-' + id + '"\n\t\t\t\thref="javascript:void(0)"\n\t\t\t\tclass="uploadify-choose-button"\n\t\t\t\t>\n\t\t\t\t<span>' + options.chooseText + '</span>\n\t\t\t</a>\n\t\t';
 			var uploadHTML = '\n\t\t\t<a id="uploadify-upload-button-' + id + '"\n\t\t\t\thref="javascript:void(0)"\n\t\t\t\tclass="uploadify-upload-button hidden"\n\t\t\t\t>\n\t\t\t\t<span>' + options.uploadText + '</span>\n\t\t\t</a>\n\t\t';
 			var errorHTML = '\n\t\t\t<span id="uploadify-error-' + id + '" class="uploadify-error hidden"><span class="uploadify-error-container"><span class="uploadify-error-msg"></span></span></span>\n\t\t';
 			var queueHTML = '\n\t\t\t<span id="uploadify-queue-' + id + '" class="uploadify-queue"></span>\n\t\t';
-			var sectionHTML = '\n\t\t\t<span class="uploadify">\n\t\t\t\t' + queueHTML + '\n\t\t\t\t' + chooseHTML + '\n\t\t\t\t' + uploadHTML + '\n\t\t\t\t' + errorHTML + '\n\t\t\t\t' + inputHTML + '\n\t\t\t</span>\n\t\t';
+			var sectionHTML = '\n\t\t\t<span class="uploadify">\n\t\t\t\t' + queueHTML + '\n\t\t\t\t' + chooseHTML + '\n\t\t\t\t' + uploadHTML + '\n\t\t\t\t' + errorHTML + '\n\t\t\t</span>\n\t\t';
 
-			this.container = document.getElementById(options.container.replace('#', ''));
+			this.container = document.querySelector(options.container);
 			var container = this.container;
 			container.innerHTML = sectionHTML;
-			this.input = container.getElementsByClassName('uploadify-input')[0];
-			this.queue = container.getElementsByClassName('uploadify-queue')[0];
-			this.chooseButton = container.getElementsByClassName('uploadify-choose-button')[0];
-			this.uploadButton = container.getElementsByClassName('uploadify-upload-button')[0];
-
-			this.resetInput = function () {
-				var el = document.createElement('div');
-				el.innerHTML = inputHTML;
-				var input = el.children[0];
-				var wrapper = container.children[0];
-				_this.input = input;
-				input.parentNode.removeChild(input);
-				wrapper.appendChild(input);
-				input.onchange = _this.onSelectFiles.bind(_this);
-			};
+			this.queue = container.querySelector('.uploadify-queue');
+			this.chooseButton = container.querySelector('.uploadify-choose-button');
+			this.uploadButton = container.querySelector('.uploadify-upload-button');
+			this.resetInput();
 
 			if (options.auto) {
 				this.hide(this.uploadButton);
@@ -194,16 +178,40 @@ var _class = function () {
 			if (options.files instanceof Array && options.files.length > 0) {
 				this.reset(options.files);
 			}
+
+			if (this.isOldIE) {
+				this.showError('Browser Not Support!', true);
+			}
+		}
+	}, {
+		key: 'resetInput',
+		value: function resetInput() {
+			var _this = this;
+
+			var id = this.id;
+			var options = this.options;
+			var inputHTML = '\n\t\t\t<input id="uploadify-input-' + id + '"\n\t\t\t\tclass="uploadify-input"\n\t\t\t\tstyle="display:none"\n\t\t\t\ttype="file"\n\t\t\t\tname="uploadifyfile[]"\n\t\t\t\t' + (options.multiple ? 'multiple' : '') + '\n\t\t\t\taccept="' + options.fileTypeExts + '"\n\t\t\t\t>\n\t\t';
+			var el = document.createElement('div');
+			el.innerHTML = inputHTML;
+			var input = el.children[0];
+			var wrapper = this.container.children[0];
+			input.parentNode.removeChild(input);
+			wrapper.appendChild(input);
+			input.onchange = function () {
+				return _this.onSelectFiles();
+			};
+			this.input = input;
 		}
 	}, {
 		key: 'events',
 		value: function events() {
 			var _this2 = this;
 
-			this.input.onchange = this.onSelectFiles.bind(this);
-			this.uploadButton.onclick = this.onClickUpload.bind(this);
+			this.uploadButton.onclick = function () {
+				return _this2.onClickUpload();
+			};
 			this.chooseButton.onclick = function () {
-				_this2.input.click();
+				return _this2.input.click();
 			};
 		}
 	}, {
@@ -212,6 +220,8 @@ var _class = function () {
 			var _this3 = this;
 
 			var options = this.options;
+
+			// if not multiple and there are some files are waiting for upload
 			if (!options.multiple && this.files.filter(function (item) {
 				return item.status < 2;
 			}).length > 0) {
@@ -272,15 +282,12 @@ var _class = function () {
 		value: function getSelectedFiles() {
 			var _this4 = this;
 
-			var files = this.isSupported ? this.input.files : this.input.value.split(',').map(function (item) {
-				var src = item.trim();
-				var file = {
-					path: src,
-					name: _this4.getFileName(src),
-					size: _this4.getImageFakeSize(src)
-				};
-				return file;
-			});
+			var inputValue = this.input.value;
+			var files = this.isIE9 ? [{
+				path: inputValue,
+				name: this.getFileName(inputValue),
+				size: this.getImageFakeSize(inputValue)
+			}] : this.input.files;
 
 			var options = this.options;
 			var arr = [];
@@ -325,7 +332,7 @@ var _class = function () {
 	}, {
 		key: 'getExistsFilesCount',
 		value: function getExistsFilesCount() {
-			return this.queue.getElementsByClassName('uploadify-item').length;
+			return this.files.length;
 		}
 	}, {
 		key: 'formatFileSize',
@@ -375,7 +382,7 @@ var _class = function () {
 			this.queue.appendChild(element);
 
 			file.element = element;
-			file.element.getElementsByClassName('uploadify-item-delete')[0].onclick = function (e) {
+			file.element.querySelector('.uploadify-item-delete').onclick = function (e) {
 				_this5.onClickDelete(element, e.target);
 			};
 
@@ -384,7 +391,7 @@ var _class = function () {
 	}, {
 		key: 'uploadFile',
 		value: function uploadFile(file) {
-			this.isSupported ? this.uploadFileByXHR(file) : this.uploadFileByIFrame(file);
+			this.isIE9 ? this.uploadFileByIFrame(file) : this.uploadFileByXHR(file);
 			this.resetInput();
 		}
 	}, {
@@ -404,9 +411,9 @@ var _class = function () {
 			f.style.height = '1px';
 			f.style.overflow = 'auto';
 			f.innerHTML = '\n\t\t\t<form action="' + options.url + '" method="' + options.method + '" target="upload-iframe-' + id + '-' + file.index + '" enctype="multipart/form-data">\n\t\t\t\t<button type="submit"></button>\n\t\t\t</form>\n\t\t\t<iframe name="upload-iframe-' + id + '-' + file.index + '"></iframe>\n\t\t';
-			f.getElementsByTagName('form')[0].appendChild(this.input);
+			f.querySelector('form').appendChild(this.input);
 
-			var iframe = f.getElementsByTagName('iframe')[0];
+			var iframe = f.querySelector('iframe');
 			var iframeOnload = function iframeOnload(isTimeout) {
 				if (file.status !== 1) {
 					return;
@@ -416,21 +423,35 @@ var _class = function () {
 					_this6.invoke(options.onUploadError, file, 'timeout');
 					file.element.className += ' error';
 				} else {
-					var responseDoc = iframe.contentDocument || iframe.contentWindow.document;
-					var responseText = responseDoc.body.children[0].innerText;
-
 					file.status = 2;
-					_this6.invoke(options.onUploadSuccess, file, responseText);
-
-					file.element.getElementsByClassName('uploadify-item-container')[0].removeChild(file.element.getElementsByClassName('uploadify-item-progress')[0]);
+					file.element.querySelector('.uploadify-item-container').removeChild(file.element.querySelector('.uploadify-item-progress'));
 					file.element.className += ' success';
 
-					if (options.showPreview > 1) {
-						var data = JSON.parse(responseText);
-						if (data && data[options.showPreviewField]) {
-							file.element.style.backgroundImage = 'url(' + data[options.showPreviewField] + ')';
+					var notify = function notify() {
+						var responseDoc = iframe.contentDocument || iframe.contentWindow.document;
+						var responseText = responseDoc.body.children.length && responseDoc.body.children[0].innerText;
+
+						if (responseText) {
+							_this6.invoke(options.onUploadSuccess, file, responseText);
+							if (options.showPreview > 1) {
+								var data = JSON.parse(responseText);
+								if (data && data[options.showPreviewField]) {
+									file.element.style.backgroundImage = 'url(' + data[options.showPreviewField] + ')';
+								}
+							}
 						}
-					}
+
+						return responseText;
+					};
+
+					var count = 1;
+					var timer = setInterval(function () {
+						var responseText = notify();
+						if (responseText || count === 10) {
+							clearInterval(timer);
+						}
+						count++;
+					}, 500);
 				}
 
 				_this6.invoke(options.onUploadComplete);
@@ -448,7 +469,7 @@ var _class = function () {
 			}
 
 			document.body.appendChild(f);
-			f.getElementsByTagName('button')[0].click();
+			f.querySelector('button').click();
 
 			file.status = 1;
 			file.iframe = iframe.parentNode;
@@ -482,7 +503,7 @@ var _class = function () {
 
 						_this7.invoke(options.onUploadSuccess, file, xhr.responseText);
 
-						file.element.getElementsByClassName('uploadify-item-container')[0].removeChild(file.element.getElementsByClassName('uploadify-item-progress')[0]);
+						file.element.querySelector('.uploadify-item-container').removeChild(file.element.querySelector('.uploadify-item-progress'));
 						file.element.className += ' success';
 
 						if (options.showPreview > 1) {
@@ -533,7 +554,7 @@ var _class = function () {
 		key: 'onProgress',
 		value: function onProgress(file, loaded, total) {
 			var percent = (loaded / total * 100).toFixed(2) + '%';
-			var processEl = file.element.getElementsByClassName('uploadify-item-progress')[0];
+			var processEl = file.element.querySelector('.uploadify-item-progress');
 			var html = void 0;
 
 			switch (this.options.showUploadProcess) {
@@ -611,7 +632,7 @@ var _class = function () {
 				_this9.queue.appendChild(element);
 
 				file.element = element;
-				file.element.getElementsByClassName('uploadify-item-delete')[0].onclick = function (e) {
+				file.element.querySelector('.uploadify-item-delete').onclick = function (e) {
 					_this9.onClickDelete(element, e.target);
 				};
 
@@ -629,12 +650,16 @@ var _class = function () {
 		value: function showError(msg) {
 			var _this10 = this;
 
-			var errorEl = this.container.getElementsByClassName('uploadify-error')[0];
-			errorEl.getElementsByClassName('uploadify-error-msg')[0].innerText = msg;
+			var notDisappear = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+			var errorEl = this.container.querySelector('.uploadify-error');
+			errorEl.querySelector('.uploadify-error-msg').innerText = msg;
 			this.fadeIn(errorEl);
-			setTimeout(function () {
-				return _this10.fadeOut(errorEl);
-			}, 1500);
+			if (!notDisappear) {
+				setTimeout(function () {
+					return _this10.fadeOut(errorEl);
+				}, 1500);
+			}
 		}
 		// =============== functions ================
 
@@ -738,12 +763,11 @@ var _class = function () {
 		}
 	}]);
 
-	return _class;
+	return HHuploadify;
 }();
 
-/* harmony default export */ __webpack_exports__["default"] = (_class);
+/* harmony default export */ __webpack_exports__["default"] = (HHuploadify);
 
 /***/ })
 /******/ ]);
-      window["HHuploadify"] = window["HHuploadify"].default;
-    
+window["HHuploadify"] = window["HHuploadify"]["default"];

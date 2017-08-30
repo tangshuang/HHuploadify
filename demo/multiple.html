@@ -24,16 +24,16 @@
 <span id="item1"></span>
 <span id="item2"></span>
 <script>
-let template = `
-  <span id="uploadify-{queueId}-{fileId}" class="uploadify-item">
-    <span class="uploadify-item-container">
-      <span class="uploadify-item-progress"></span>
-      <span class="uploadify-item-title">{title}</span>
-      <a href="javascript:void(0);" class="uploadify-item-delete" data-fileid="{fileId}">&times;</a>
-    </span>
-  </span>
-`
-let render = title => {
+var template = '\
+  <span id="uploadify-{queueId}-{fileId}" class="uploadify-item">\
+    <span class="uploadify-item-container">\
+      <span class="uploadify-item-progress"></span>\
+      <span class="uploadify-item-title">{title}</span>\
+      <a href="javascript:void(0);" class="uploadify-item-delete" data-fileid="{fileId}">&times;</a>\
+    </span>\
+  </span>\
+'
+var render = function(title) {
   return template.replace('{title}', title)
 }
 new HHuploadify({
@@ -63,7 +63,7 @@ new HHuploadify({
 	container: '#upload2',
 	url: '/upload',
   auto: true,
-  onSelect(files, exists) {
+  onSelect: function(files, exists) {
     if (files.length + exists.length >= 4) {
       if (exists.length > 4) {
         while (files.length) {
@@ -81,7 +81,7 @@ new HHuploadify({
       this.hide(this.chooseButton)
     }
   },
-  onRemoved() {
+  onRemoved: function() {
     this.show(this.chooseButton)
   },
 })

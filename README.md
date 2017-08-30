@@ -12,7 +12,7 @@ But it's different from the other two:
 
 ![screenshot](https://github.com/tangshuang/HHuploadify/blob/master/screenshot.png?raw=true)
 
-Browsers <=IE8 are not supported. IE9 is partly supported, may have some bugs.
+Browsers <=IE8 are not supported. IE9 is partly supported, there may be some problems when you recieve responseText after uploaded.
 
 ## Install
 
