@@ -471,7 +471,7 @@ export default class HHuploadify {
 	onProgress(file, loaded, total) {
 		let percent = (loaded / total * 100).toFixed(2) +'%'
 		let processEl = file.element.querySelector('.uploadify-item-progress')
-		let html
+		let html = ''
 
 		switch (this.options.showUploadProcess) {
 			case 'bar':
@@ -480,21 +480,22 @@ export default class HHuploadify {
 						<span class="uploadify-progress-bar-inner" style="width:${percent}"></span>
 					</span>
 				`
-				processEl.innerHTML = html
 				break
 			case 'percent':
 				html = `
 					<span class="uploadify-progress-percent">${percent}</span>
 				`
-				processEl.innerHTML = html
 				break
 			case 'size':
-			default:
 				html = `
 					<span class="uploadify-progress-size">${this.formatFileSize(loaded)} / ${this.formatFileSize(total)}</span>
 				`
-				processEl.innerHTML = html
+				break
+			default:
+				html = ''
 		}
+		
+		processEl.innerHTML = html
 	}
 	onClickUpload() {
 		this.foreach(this.files, file => this.uploadFile(file))
