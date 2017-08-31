@@ -2,7 +2,6 @@ export default class HHuploadify {
 	constructor(options = {}) {
 		if (!options.container || options.container.indexOf('#') !== 0) {
 			throw new Error('The container field you passed into HHuploadify is not correct!')
-			return
 		}
 
 		let defaults = {
