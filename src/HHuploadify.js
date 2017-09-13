@@ -1,10 +1,5 @@
 export default class HHuploadify {
 	constructor(options = {}) {
-		if (!options.container || options.container.indexOf('#') !== 0) {
-			throw new Error('The container field you passed into HHuploadify is not correct!')
-			return
-		}
-
 		let defaults = {
 
 			container: '', // i.e. #upload
@@ -324,7 +319,7 @@ export default class HHuploadify {
 		let f = document.createElement('div')
 		f.style.position = 'absolute'
 		f.style.top = '-1000px'
-    f.style.left = '-1000px'
+    		f.style.left = '-1000px'
 		f.style.height = '1px'
 		f.style.overflow = 'auto'
 		f.innerHTML = `
@@ -384,11 +379,11 @@ export default class HHuploadify {
 			}
 		}
 		if (window.addEventListener) {
-      iframe.addEventListener('load', iframeOnload, false)
-    }
-    else {
-      iframe.attachEvent('onload', iframeOnload)
-    }
+		      iframe.addEventListener('load', iframeOnload, false)
+		}
+		else {
+		      iframe.attachEvent('onload', iframeOnload)
+		}
 
 		document.body.appendChild(f)
 		f.querySelector('button').click()
